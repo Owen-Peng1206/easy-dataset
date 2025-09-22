@@ -40,7 +40,7 @@ With Easy Dataset, you can transform domain knowledge into structured datasets, 
 - **Domain Labels**: Intelligently builds global domain labels for datasets, with global understanding capabilities
 - **Answer Generation**: Uses LLM API to generate comprehensive answers and Chain of Thought (COT)
 - **Flexible Editing**: Edit questions, answers, and datasets at any stage of the process
-- **Multiple Export Formats**: Export datasets in various formats (Alpaca, ShareGPT) and file types (JSON, JSONL)
+- **Multiple Export Formats**: Export datasets in various formats (Alpaca, ShareGPT, multilingual-thinking) and file types (JSON, JSONL)
 - **Wide Model Support**: Compatible with all LLM APIs that follow the OpenAI format
 - **User-Friendly Interface**: Intuitive UI designed for both technical and non-technical users
 - **Custom System Prompts**: Add custom system prompts to guide model responses
@@ -254,7 +254,7 @@ docker run -d \
 </table>
 
 1. Click the "Export" button in the Datasets section;
-2. Choose your preferred format (Alpaca or ShareGPT);
+2. Choose your preferred format (Alpaca or ShareGPT or multilingual-thinking);
 3. Select the file format (JSON or JSONL);
 4. Add custom system prompts as needed;
 5. Export your dataset

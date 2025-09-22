@@ -12,6 +12,7 @@ const ExportDatasetDialog = ({ open, onClose, onExport, projectId }) => {
   const { t } = useTranslation();
   const [formatType, setFormatType] = useState('alpaca');
   const [systemPrompt, setSystemPrompt] = useState('');
+  const [reasoningLanguage, setReasoningLanguage] = useState('');
   const [confirmedOnly, setConfirmedOnly] = useState(false);
   const [fileFormat, setFileFormat] = useState('json');
   const [includeCOT, setIncludeCOT] = useState(true);
@@ -47,6 +48,12 @@ const ExportDatasetDialog = ({ open, onClose, onExport, projectId }) => {
         questionField: 'content',
         answerField: 'content'
       });
+    } else if (event.target.value === 'multilingual-thinking') {
+      setCustomFields({
+        ...customFields,
+        questionField: 'content',
+        answerField: 'content'
+      });
     } else if (event.target.value === 'custom') {
       // 自定义格式保持当前值
     }
@@ -56,6 +63,9 @@ const ExportDatasetDialog = ({ open, onClose, onExport, projectId }) => {
     setSystemPrompt(event.target.value);
   };
 
+  const handleReasoningLanguageChange = event => {
+    setReasoningLanguage(event.target.value);
+  };
   const handleConfirmedOnlyChange = event => {
     setConfirmedOnly(event.target.checked);
   };
@@ -107,6 +117,7 @@ const ExportDatasetDialog = ({ open, onClose, onExport, projectId }) => {
     onExport({
       formatType,
       systemPrompt,
+      reasoningLanguage,
       confirmedOnly,
       fileFormat,
       includeCOT,
@@ -144,6 +155,7 @@ const ExportDatasetDialog = ({ open, onClose, onExport, projectId }) => {
             fileFormat={fileFormat}
             formatType={formatType}
             systemPrompt={systemPrompt}
+            reasoningLanguage={reasoningLanguage}
             confirmedOnly={confirmedOnly}
             includeCOT={includeCOT}
             customFields={customFields}
@@ -152,6 +164,7 @@ const ExportDatasetDialog = ({ open, onClose, onExport, projectId }) => {
             handleFileFormatChange={handleFileFormatChange}
             handleFormatChange={handleFormatChange}
             handleSystemPromptChange={handleSystemPromptChange}
+            handleReasoningLanguageChange={handleReasoningLanguageChange}
             handleConfirmedOnlyChange={handleConfirmedOnlyChange}
             handleIncludeCOTChange={handleIncludeCOTChange}
             handleCustomFieldChange={handleCustomFieldChange}
@@ -170,10 +183,12 @@ const ExportDatasetDialog = ({ open, onClose, onExport, projectId }) => {
           <LlamaFactoryTab
             projectId={projectId}
             systemPrompt={systemPrompt}
+            reasoningLanguage={reasoningLanguage}
             confirmedOnly={confirmedOnly}
             includeCOT={includeCOT}
             formatType={formatType}
             handleSystemPromptChange={handleSystemPromptChange}
+            handleReasoningLanguageChange={handleReasoningLanguageChange}
             handleConfirmedOnlyChange={handleConfirmedOnlyChange}
             handleIncludeCOTChange={handleIncludeCOTChange}
           />
@@ -184,12 +199,14 @@ const ExportDatasetDialog = ({ open, onClose, onExport, projectId }) => {
           <HuggingFaceTab
             projectId={projectId}
             systemPrompt={systemPrompt}
+            reasoningLanguage={reasoningLanguage}
             confirmedOnly={confirmedOnly}
             includeCOT={includeCOT}
             formatType={formatType}
             fileFormat={fileFormat}
             customFields={customFields}
             handleSystemPromptChange={handleSystemPromptChange}
+            handleReasoningLanguageChange={handleReasoningLanguageChange}
             handleConfirmedOnlyChange={handleConfirmedOnlyChange}
             handleIncludeCOTChange={handleIncludeCOTChange}
           />

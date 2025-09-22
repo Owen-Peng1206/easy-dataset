@@ -28,7 +28,7 @@ import {
   Alert,
   CircularProgress
 } from '@mui/material';
-
+ 
 const LocalExportTab = ({
   fileFormat,
   formatType,
@@ -38,9 +38,11 @@ const LocalExportTab = ({
   customFields,
   alpacaFieldType,
   customInstruction,
+  reasoningLanguage,
   handleFileFormatChange,
   handleFormatChange,
   handleSystemPromptChange,
+  handleReasoningLanguageChange,
   handleConfirmedOnlyChange,
   handleIncludeCOTChange,
   handleCustomFieldChange,
@@ -153,6 +155,7 @@ const LocalExportTab = ({
       balanceConfig: validConfig,
       formatType,
       systemPrompt,
+      reasoningLanguage,
       confirmedOnly,
       fileFormat,
       includeCOT,
@@ -260,6 +263,41 @@ const LocalExportTab = ({
           }
         ]
       };
+    } else if (formatType === 'multilingualthinking') {
+      return {
+        headers: 'messages',
+        rows: 
+          {
+            messages: JSON.stringify(              
+                {
+                  reasoning_language: 'English',
+                  developer: '系统提示词（选填）',
+                  user: '人类指令', // 映射到 question 字段
+                  analysis: '模型的思维链内容',  // 映射到 cot 字段
+                  final: '模型回答',        // 映射到 answer 字段
+                  messages: [
+                    {
+                      role: 'system',
+                      content: '系统提示词（选填）',
+                      thinking: 'null'
+                    },
+                    {
+                      role: 'user',
+                      content: '人类指令', // 映射到 question 字段
+                      thinking: 'null'
+                    },
+                    {
+                      role: 'assistant',
+                      content: '模型回答', // 映射到 answer 字段
+                      thinking: '模型的思维链内容' // 映射到 cot 字段
+                    }
+                  ]
+                },              
+              null,
+              2
+            )
+          }        
+      };
     } else if (formatType === 'custom') {
       // 如果选择仅导出问题，只包含问题字段
       if (customFields.questionOnly) {
@@ -276,6 +314,7 @@ const LocalExportTab = ({
           headers,
           rows: [row]
         };
+
       } else {
         // 正常的自定义格式
         const headers = [customFields.questionField, customFields.answerField];
@@ -314,7 +353,12 @@ const LocalExportTab = ({
           >
             <FormControlLabel value="json" control={<Radio />} label="JSON" />
             <FormControlLabel value="jsonl" control={<Radio />} label="JSONL" />
-            <FormControlLabel value="csv" control={<Radio />} label="CSV" />
+            {/* <FormControlLabel value="csv" control={<Radio />} label="CSV" /> */}
+            <FormControlLabel
+              value="csv"
+              control={<Radio disabled={formatType === 'multilingualthinking'} />}
+              label="CSV"
+            />
           </RadioGroup>
         </FormControl>
       </Box>
@@ -328,7 +372,13 @@ const LocalExportTab = ({
           <RadioGroup aria-label="format" name="format" value={formatType} onChange={handleFormatChange} row>
             <FormControlLabel value="alpaca" control={<Radio />} label="Alpaca" />
             <FormControlLabel value="sharegpt" control={<Radio />} label="ShareGPT" />
-            <FormControlLabel value="custom" control={<Radio />} label={t('export.customFormat')} />
+             <FormControlLabel value="custom" control={<Radio />} label={t('export.customFormat')} />
+             {/* NEW: Multilingual‑Thinking format */}
+             <FormControlLabel
+               value="multilingualthinking"
+               control={<Radio disabled={fileFormat === 'csv'} />}
+               label={t('export.multilingualThinkingFormat') || 'Multilingual‑Thinking'}
+             />
           </RadioGroup>
         </FormControl>
       </Box>
@@ -478,6 +528,37 @@ const LocalExportTab = ({
             <pre style={{ margin: 0 }}>
               {formatType === 'custom'
                 ? getCustomFormatExample()
+                : formatType === 'multilingualthinking'
+                  ? fileFormat === 'json'
+                    ? JSON.stringify(                        
+                          {
+                            reasoning_language: 'English',
+                            developer: '系统提示词（选填）',
+                            user: '人类指令', // 映射到 question 字段
+                            analysis: '模型的思维链内容',  // 映射到 cot 字段
+                            final: '模型回答',        // 映射到 answer 字段
+                            messages: [
+                              {
+                                content: "系统提示词（选填）",
+                                role: "system",
+                                thinking: null
+                              },                              
+                              {
+                                content: '人类指令',
+                                role: 'user',                                
+                                thinking: null
+                              },
+                              {
+                                content: '模型回答',                                
+                                role: 'assistant',
+                                thinking: '模型的思维链内容'
+                              }
+                            ]
+                          },                        
+                        null,
+                        2
+                      )
+                    : '{"reasoning_language": "English","developer": "系统提示词（选填）", "user": "人类指令", "analysis": "模型的思维链内容", "final": "模型回答", "messages": [{"role": "user", "content": "人类指令", "thinking": "null"}, {"role": "assistant", "content": "模型回答", "thinking": "模型的思维链内容"}]}'
                 : formatType === 'alpaca'
                   ? fileFormat === 'json'
                     ? JSON.stringify(
@@ -536,7 +617,23 @@ const LocalExportTab = ({
           onChange={handleSystemPromptChange}
         />
       </Box>
-
+      {/* Reasoning language – only for multilingual‑thinking */}
+      {formatType === 'multilingualthinking' && (
+      <Box sx={{ mb: 3 }}>
+      <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+      {t('export.Reasoninglanguage')}
+      </Typography>
+      <TextField
+        fullWidth
+        rows={3}
+        multiline
+        variant="outlined"
+        placeholder={t('export.ReasoninglanguagePlaceholder')}
+        value={reasoningLanguage}
+        onChange={handleReasoningLanguageChange}
+      />
+      </Box>
+     )}
       <Box sx={{ mb: 2, display: 'flex', flexDirection: 'row', gap: 4 }}>
         <FormControlLabel
           control={<Checkbox checked={confirmedOnly} onChange={handleConfirmedOnlyChange} />}

@@ -256,7 +256,7 @@ docker run -d \
 </table>
 
 1. 在数据集部分点击"导出"按钮；
-2. 选择您喜欢的格式（Alpaca 或 ShareGPT）；
+2. 选择您喜欢的格式（Alpaca 或 ShareGPT 或 multilingual-thinking）；
 3. 选择文件格式（JSON 或 JSONL）；
 4. 根据需要添加自定义系统提示；
 5. 导出您的数据集

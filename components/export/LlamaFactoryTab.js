@@ -19,10 +19,12 @@ import CheckIcon from '@mui/icons-material/Check';
 const LlamaFactoryTab = ({
   projectId,
   systemPrompt,
+  reasoningLanguage,
   confirmedOnly,
   includeCOT,
   formatType,
   handleSystemPromptChange,
+  handleReasoningLanguageChange,
   handleConfirmedOnlyChange,
   handleIncludeCOTChange
 }) => {
@@ -73,6 +75,7 @@ const LlamaFactoryTab = ({
         body: JSON.stringify({
           formatType,
           systemPrompt,
+          reasoningLanguage,
           confirmedOnly,
           includeCOT
         })
@@ -112,7 +115,23 @@ const LlamaFactoryTab = ({
           variant="outlined"
         />
       </Box>
-
+      {/* Reasoning language – only for multilingual‑thinking */}
+      {formatType === 'multilingualthinking' && (
+      <Box sx={{ mb: 3 }}>
+      <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+      {t('export.reasoningLanguage')}
+      </Typography>
+      <TextField
+        fullWidth
+        rows={3}
+        multiline
+        variant="outlined"
+        placeholder={t('export.reasoningLanguage')}
+        value={reasoningLanguage}
+        onChange={handleReasoningLanguageChange}
+      />
+      </Box>
+     )}
       <Box sx={{ mb: 2, display: 'flex', flexDirection: 'row', gap: 4 }}>
         <FormControlLabel
           control={<Checkbox checked={confirmedOnly} onChange={handleConfirmedOnlyChange} />}

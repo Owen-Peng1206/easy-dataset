@@ -144,6 +144,32 @@ const useDatasetExport = projectId => {
 
         return { messages };
       });
+    } else if (exportOptions.formatType === 'multilingualthinking') {
+      // 產生符合「Multilingual‑Thinking」的 JSON 結構
+      formattedData = dataToExport.map(({ question, answer, cot }) => ({
+        reasoning_language: exportOptions.reasoningLanguage ? exportOptions.reasoningLanguage : 'English',
+        developer: exportOptions.systemPrompt || '',
+        user: question,
+        analysis: exportOptions.includeCOT && cot ? cot : null,
+        final: answer,
+        messages: [
+          {
+            content: exportOptions.systemPrompt|| '',          
+            role: 'system',
+            thinking: null      
+          },       
+          {
+            content: question,          
+            role: 'user',
+            thinking: null
+          },
+          {
+            content: answer,
+            role: 'assistant',          
+            thinking: exportOptions.includeCOT && cot ? cot : null
+          }
+        ]
+      }));
     } else if (exportOptions.formatType === 'custom') {
       // 处理自定义格式
       const { questionField, answerField, cotField, includeLabels, includeChunk, questionOnly } =
@@ -198,6 +224,7 @@ const useDatasetExport = projectId => {
               // 处理包含逗号、换行符或双引号的字段
               let field = item[header]?.toString() || '';
               if (exportOptions.formatType === 'sharegpt') field = JSON.stringify(item[header]);
+              if (exportOptions.formatType === 'multilingualthinking') field = JSON.stringify(item[header]);
               if (field.includes(',') || field.includes('\n') || field.includes('"')) {
                 field = `"${field.replace(/"/g, '""')}"`;
               }
@@ -218,10 +245,19 @@ const useDatasetExport = projectId => {
     const blob = new Blob([content], { type: mimeType || 'application/json' });
 
     // 创建下载链接
+    // Determine a human‑readable suffix based on the selected format type
+    const formatSuffixMap = {
+      alpaca: 'alpaca',
+      'multilingual-thinking': 'multilingual-thinking',
+      sharegpt: 'sharegpt',
+      custom: 'custom',
+    };
+
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    const formatSuffix = exportOptions.formatType === 'alpaca' ? 'alpaca' : 'sharegpt';
+    // const formatSuffix = exportOptions.formatType === 'alpaca' ? 'alpaca' : 'multilingual-thinking';
+    const formatSuffix = formatSuffixMap[exportOptions.formatType] || exportOptions.formatType;
     const balanceSuffix = exportOptions.balanceMode ? '-balanced' : '';
     const dateStr = new Date().toISOString().slice(0, 10);
     a.download = `datasets-${projectId}-${formatSuffix}${balanceSuffix}-${dateStr}.${fileExtension}`;

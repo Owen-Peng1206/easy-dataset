@@ -396,6 +396,8 @@
     "fileFormat": "文件格式",
     "systemPrompt": "系统提示词",
     "systemPromptPlaceholder": "请输入系统提示词...",
+    "ReasoninglanguagePlaceholder": "请输入Reasoning language : English or Chinese or others",
+    "Reasoninglanguage": "推理语言",
     "onlyConfirmed": "仅导出已确认数据",
     "example": "格式示例",
     "confirmExport": "确认导出",
@@ -428,7 +430,8 @@
     "viewOnHuggingFace": "在 HuggingFace查看",
     "noTokenWarning": "未找到 HuggingFace 令牌。请在项目设置中配置令牌。",
     "goToSettings": "前往设置",
-    "tokenHelp": "您可以从HuggingFace设置页面获取令牌"
+    "tokenHelp": "您可以从HuggingFace设置页面获取令牌",
+    "multilingualThinkingFormat": "Multilingual‑Thinking"    
   },
   "datasets": {
     "loadingDataset": "正在加载数据集详情...",
