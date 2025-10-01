@@ -133,8 +133,47 @@ export default function DatasetsPage({ params }) {
       setLoading(false);
     }
   };
-
+const saveListState = () => {
+  // Gather only the values that influence the list view
+  const stateToSave = {
+    page,
+    rowsPerPage,
+    searchQuery,
+    searchField,
+    filterConfirmed,
+    filterHasCot,
+    filterIsDistill,
+    filterScoreRange,
+    filterCustomTag,
+    filterNoteKeyword,
+  };
+  
+  // sessionStorage survives a full page reload and is scoped to the browser tab
+  sessionStorage.setItem('datasetsPageState', JSON.stringify(stateToSave));
+};
   useEffect(() => {
+    const stored = sessionStorage.getItem('datasetsPageState');
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        // Restore each piece of state
+        if (parsed.page !== undefined) setPage(parsed.page);
+        if (parsed.rowsPerPage !== undefined) setRowsPerPage(parsed.rowsPerPage);
+        if (parsed.searchQuery !== undefined) setSearchQuery(parsed.searchQuery);
+        if (parsed.searchField !== undefined) setSearchField(parsed.searchField);
+        if (parsed.filterConfirmed !== undefined) setFilterConfirmed(parsed.filterConfirmed);
+        if (parsed.filterHasCot !== undefined) setFilterHasCot(parsed.filterHasCot);
+        if (parsed.filterIsDistill !== undefined) setFilterIsDistill(parsed.filterIsDistill);
+        if (parsed.filterScoreRange !== undefined) setFilterScoreRange(parsed.filterScoreRange);
+        if (parsed.filterCustomTag !== undefined) setFilterCustomTag(parsed.filterCustomTag);
+        if (parsed.filterNoteKeyword !== undefined) setFilterNoteKeyword(parsed.filterNoteKeyword);
+      } catch (e) {
+        console.warn('Failed to restore dataset list state:', e);
+      } finally {
+        // Avoid leaking stale state
+        sessionStorage.removeItem('datasetsPageState');
+      }
+  }    
     getDatasetsList();
     // 获取项目中所有使用过的标签
     const fetchAvailableTags = async () => {
@@ -325,6 +364,9 @@ export default function DatasetsPage({ params }) {
 
   // 查看详情
   const handleViewDetails = id => {
+    // Persist the current list filters/pagination
+    saveListState();
+    // Navigate to the detail page
     router.push(`/projects/${projectId}/datasets/${id}`);
   };
 
