@@ -305,7 +305,7 @@ export default function PromptSettings() {
     setSelectedCategory(newCategory);
     // 根据当前语言环境选择第一个匹配的提示词
     const promptEntries = Object.keys(templates[newCategory]?.prompts || {});
-    console.log('所有提示词:', promptEntries);
+//    console.log('所有提示词:', promptEntries);
 
     const firstPrompt = promptEntries.find(promptKey => shouldShowPrompt(promptKey, currentLanguage));
 
