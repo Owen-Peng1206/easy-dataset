@@ -99,7 +99,7 @@ export default function FileUploader({
       const model = JSON.parse(localStorage.getItem('modelConfigList'));
 
       //过滤出视觉模型
-      const visionItems = model.filter(item => item.type === 'vision' && item.apiKey);
+      const visionItems = model.filter(item => item.type === 'vision');
 
       //先默认选择第一个配置的视觉模型
       if (visionItems.length > 0) {
