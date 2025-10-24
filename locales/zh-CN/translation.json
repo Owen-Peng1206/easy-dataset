@@ -879,7 +879,11 @@
     "datasetType": "数据集类型",
     "singleTurnDataset": "单轮对话数据集",
     "multiTurnDataset": "多轮对话数据集",
-    "bothDatasetTypes": "两种数据集都生成"
+    "bothDatasetTypes": "两种数据集都生成",
+    "autoDistillTaskDetail": "自动蒸馏任务: {{topic}}",
+    "backgroundTaskCreated": "后台蒸馏任务已创建，可在任务管理中查看进度",
+    "backgroundTaskFailed": "创建后台任务失败",
+    "taskExecutionError": "任务执行出错: {{error}}"
   },
   "tasks": {
     "pending": "有 {{count}} 个任务处理中",

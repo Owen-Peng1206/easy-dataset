@@ -893,7 +893,11 @@
     "datasetType": "Dataset Type",
     "singleTurnDataset": "Single-turn Dataset",
     "multiTurnDataset": "Multi-turn Dataset",
-    "bothDatasetTypes": "Generate Both Dataset Types"
+    "bothDatasetTypes": "Generate Both Dataset Types",
+    "autoDistillTaskDetail": "Auto Distill Task: {{topic}}",
+    "backgroundTaskCreated": "Background distill task created. You can check the progress in the task management center.",
+    "backgroundTaskFailed": "Failed to create background task",
+    "taskExecutionError": "Task execution error: {{error}}"
   },
   "tasks": {
     "pending": "{{count}} tasks are processing",
