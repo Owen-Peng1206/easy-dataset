@@ -301,16 +301,24 @@ export default function DatasetsPage({ params }) {
   // 处理导出数据集 - 智能选择导出方式
   const handleExportDatasets = async exportOptions => {
     try {
-      // 如果有选中数据集，则传递选中的 ID 列表，否则传递筛选条件
-      const exportOptionsWithSelection = {
-        ...exportOptions,
-        ...(selectedIds.length > 0 && { selectedIds })
-      };
+      // 如果是平衡导出，则忽略选中项，按 balanceConfig 导出
+      const exportOptionsWithSelection = exportOptions.balanceMode
+        ? { ...exportOptions }
+        : { ...exportOptions, ...(selectedIds.length > 0 && { selectedIds }) };
 
-      // 获取数据总量：如果有选中数据集则使用选中数量，否则使用当前筛选条件下的数据总量
-      const totalCount = selectedIds.length > 0 ? selectedIds.length : datasets.total || 0;
+      // 获取数据总量：
+      // 平衡导出时，按 balanceConfig 的总量计算；
+      // 其他情况：如果有选中数据集则使用选中数量，否则使用当前筛选条件下的数据总量
+      const balancedTotal = Array.isArray(exportOptions.balanceConfig)
+        ? exportOptions.balanceConfig.reduce((sum, c) => sum + (parseInt(c.maxCount) || 0), 0)
+        : 0;
+      const totalCount = exportOptions.balanceMode
+        ? balancedTotal
+        : selectedIds.length > 0
+          ? selectedIds.length
+          : datasets.total || 0;
 
-      // 设置阈值：超过2000条数据使用流式导出
+      // 设置阈值：超过1000条数据使用流式导出
       const STREAMING_THRESHOLD = 1000;
 
       // 检查是否需要包含文本块内容

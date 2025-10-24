@@ -19,28 +19,31 @@ const useDatasetExport = projectId => {
       // 分批获取数据
       while (hasMore) {
         const apiUrl = `/api/projects/${projectId}/datasets/export`;
-        const body = {
+        const requestBody = {
           batchMode: true,
-          offset,
-          batchSize,
-          // 如果有选中的数据集 ID，传递 ID 列表，否则根据 confirmedOnly 传 status
-          ...(exportOptions.selectedIds && exportOptions.selectedIds.length > 0
-            ? { selectedIds: exportOptions.selectedIds }
-            : exportOptions.confirmedOnly
-              ? { status: 'confirmed' }
-              : {}),
-          // 平衡导出配置
-          ...(exportOptions.balanceMode && exportOptions.balanceConfig
-            ? { balanceMode: true, balanceConfig: exportOptions.balanceConfig }
-            : {})
+          offset: offset,
+          batchSize: batchSize
         };
 
-        const response = await axios.post(apiUrl, body);
+        // 如果有选中的数据集 ID，传递 ID 列表
+        if (exportOptions.selectedIds && exportOptions.selectedIds.length > 0) {
+          requestBody.selectedIds = exportOptions.selectedIds;
+        } else if (exportOptions.confirmedOnly) {
+          requestBody.status = 'confirmed';
+        }
+
+        // 检查是否是平衡导出模式
+        if (exportOptions.balanceMode && exportOptions.balanceConfig) {
+          requestBody.balanceMode = true;
+          requestBody.balanceConfig = exportOptions.balanceConfig;
+        }
+
+        const response = await axios.post(apiUrl, requestBody);
         const batchResult = response.data;
 
         // 如果需要包含文本块内容，批量查询并填充
         if (exportOptions.customFields?.includeChunk && batchResult.data.length > 0) {
-          const chunkNames = batchResult.data.map(item => item.chunkName).filter(name => name);
+          const chunkNames = batchResult.data.map(item => item.chunkName).filter(name => name); // 过滤掉空值
 
           if (chunkNames.length > 0) {
             try {
@@ -243,6 +246,8 @@ const useDatasetExport = projectId => {
       fileExtension = 'json';
     }
 
+    console.log(22222, content);
+
     // 创建 Blob 对象
     const blob = new Blob([content], { type: mimeType || 'application/json' });
 
@@ -259,7 +264,7 @@ const useDatasetExport = projectId => {
     const a = document.createElement('a');
     a.href = url;
     // const formatSuffix = exportOptions.formatType === 'alpaca' ? 'alpaca' : 'sharegpt';
-    const formatSuffix = formatSuffixMap[exportOptions.formatType] || exportOptions.formatType;
+    const formatSuffix = formatSuffixMap[exportOptions.formatType] || exportOptions.formatType || 'export';
     const balanceSuffix = exportOptions.balanceMode ? '-balanced' : '';
     const dateStr = new Date().toISOString().slice(0, 10);
     a.download = `datasets-${projectId}-${formatSuffix}${balanceSuffix}-${dateStr}.${fileExtension}`;
@@ -277,20 +282,22 @@ const useDatasetExport = projectId => {
   const exportDatasets = async exportOptions => {
     try {
       const apiUrl = `/api/projects/${projectId}/datasets/export`;
-      const body = {
-        // 如果有选中的数据集 ID，传递 ID 列表，否则根据 confirmedOnly 传 status
-        ...(exportOptions.selectedIds && exportOptions.selectedIds.length > 0
-          ? { selectedIds: exportOptions.selectedIds }
-          : exportOptions.confirmedOnly
-            ? { status: 'confirmed' }
-            : {}),
-        // 平衡导出配置
-        ...(exportOptions.balanceMode && exportOptions.balanceConfig
-          ? { balanceMode: true, balanceConfig: exportOptions.balanceConfig }
-          : {})
-      };
+      const requestBody = {};
 
-      const response = await axios.post(apiUrl, body);
+      // 如果有选中的数据集 ID，传递 ID 列表
+      if (exportOptions.selectedIds && exportOptions.selectedIds.length > 0) {
+        requestBody.selectedIds = exportOptions.selectedIds;
+      } else if (exportOptions.confirmedOnly) {
+        requestBody.status = 'confirmed';
+      }
+
+      // 检查是否是平衡导出模式
+      if (exportOptions.balanceMode && exportOptions.balanceConfig) {
+        requestBody.balanceMode = true;
+        requestBody.balanceConfig = exportOptions.balanceConfig;
+      }
+
+      const response = await axios.post(apiUrl, requestBody);
       let dataToExport = response.data;
 
       // 使用通用的数据处理和下载函数
