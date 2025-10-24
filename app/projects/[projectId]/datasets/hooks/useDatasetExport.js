@@ -18,30 +18,29 @@ const useDatasetExport = projectId => {
 
       // 分批获取数据
       while (hasMore) {
-        let apiUrl = `/api/projects/${projectId}/datasets/export`;
-        const params = ['batchMode=true', `offset=${offset}`, `batchSize=${batchSize}`];
+        const apiUrl = `/api/projects/${projectId}/datasets/export`;
+        const body = {
+          batchMode: true,
+          offset,
+          batchSize,
+          // 如果有选中的数据集 ID，传递 ID 列表，否则根据 confirmedOnly 传 status
+          ...(exportOptions.selectedIds && exportOptions.selectedIds.length > 0
+            ? { selectedIds: exportOptions.selectedIds }
+            : exportOptions.confirmedOnly
+              ? { status: 'confirmed' }
+              : {}),
+          // 平衡导出配置
+          ...(exportOptions.balanceMode && exportOptions.balanceConfig
+            ? { balanceMode: true, balanceConfig: exportOptions.balanceConfig }
+            : {})
+        };
 
-        // 如果有选中的数据集 ID，传递 ID 列表
-        if (exportOptions.selectedIds && exportOptions.selectedIds.length > 0) {
-          params.push(`selectedIds=${encodeURIComponent(JSON.stringify(exportOptions.selectedIds))}`);
-        } else if (exportOptions.confirmedOnly) {
-          params.push(`status=confirmed`);
-        }
-
-        // 检查是否是平衡导出模式
-        if (exportOptions.balanceMode && exportOptions.balanceConfig) {
-          params.push(`balanceMode=true`);
-          params.push(`balanceConfig=${encodeURIComponent(JSON.stringify(exportOptions.balanceConfig))}`);
-        }
-
-        apiUrl += `?${params.join('&')}`;
-
-        const response = await axios.get(apiUrl);
+        const response = await axios.post(apiUrl, body);
         const batchResult = response.data;
 
         // 如果需要包含文本块内容，批量查询并填充
         if (exportOptions.customFields?.includeChunk && batchResult.data.length > 0) {
-          const chunkNames = batchResult.data.map(item => item.chunkName).filter(name => name); // 过滤掉空值
+          const chunkNames = batchResult.data.map(item => item.chunkName).filter(name => name);
 
           if (chunkNames.length > 0) {
             try {
@@ -277,27 +276,21 @@ const useDatasetExport = projectId => {
   // 导出数据集（保持向后兼容的原有功能）
   const exportDatasets = async exportOptions => {
     try {
-      let apiUrl = `/api/projects/${projectId}/datasets/export`;
-      const params = [];
+      const apiUrl = `/api/projects/${projectId}/datasets/export`;
+      const body = {
+        // 如果有选中的数据集 ID，传递 ID 列表，否则根据 confirmedOnly 传 status
+        ...(exportOptions.selectedIds && exportOptions.selectedIds.length > 0
+          ? { selectedIds: exportOptions.selectedIds }
+          : exportOptions.confirmedOnly
+            ? { status: 'confirmed' }
+            : {}),
+        // 平衡导出配置
+        ...(exportOptions.balanceMode && exportOptions.balanceConfig
+          ? { balanceMode: true, balanceConfig: exportOptions.balanceConfig }
+          : {})
+      };
 
-      // 如果有选中的数据集 ID，传递 ID 列表
-      if (exportOptions.selectedIds && exportOptions.selectedIds.length > 0) {
-        params.push(`selectedIds=${encodeURIComponent(JSON.stringify(exportOptions.selectedIds))}`);
-      } else if (exportOptions.confirmedOnly) {
-        params.push(`status=confirmed`);
-      }
-
-      // 检查是否是平衡导出模式
-      if (exportOptions.balanceMode && exportOptions.balanceConfig) {
-        params.push(`balanceMode=true`);
-        params.push(`balanceConfig=${encodeURIComponent(JSON.stringify(exportOptions.balanceConfig))}`);
-      }
-
-      if (params.length > 0) {
-        apiUrl += `?${params.join('&')}`;
-      }
-
-      const response = await axios.get(apiUrl);
+      const response = await axios.post(apiUrl, body);
       let dataToExport = response.data;
 
       // 使用通用的数据处理和下载函数

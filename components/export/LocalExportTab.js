@@ -65,17 +65,12 @@ const LocalExportTab = ({
   const [error, setError] = useState('');
   const [totalCount, setTotalCount] = useState(0);
 
-  // 获取标签统计信息
+  // 获取标签统计信息（改为 GET + query 参数）
   const fetchTagStats = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/projects/${projectId}/datasets/export`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ confirmed: confirmedOnly })
-      });
+      const url = `/api/projects/${projectId}/datasets/export?confirmed=${confirmedOnly ? 'true' : 'false'}`;
+      const response = await fetch(url, { method: 'GET' });
 
       if (!response.ok) {
         throw new Error(t('errors.getTagStatsFailed'));
