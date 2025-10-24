@@ -236,7 +236,7 @@ export default function ModelSettings({ projectId }) {
   // 保存模型
   const handleSaveModel = () => {
     axios
-      .post(`/api/projects/${projectId}/model-config`, modelConfigForm)
+      .post(`/api/projects/${projectId}/model-config`, { ...modelConfigForm, modelId: modelConfigForm.modelName })
       .then(response => {
         if (selectedModelInfo && selectedModelInfo.id === response.data.id) {
           setSelectedModelInfo(response.data);
