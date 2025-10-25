@@ -27,7 +27,7 @@ export async function GET(request, { params }) {
           temperature: DEFAULT_MODEL_SETTINGS.temperature,
           maxTokens: DEFAULT_MODEL_SETTINGS.maxTokens,
           topK: 0,
-          topP: 0,
+          topP: DEFAULT_MODEL_SETTINGS.topP,
           status: 1
         };
         insertModelConfigList.push(data);
