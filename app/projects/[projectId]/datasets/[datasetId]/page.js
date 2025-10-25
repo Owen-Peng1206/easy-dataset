@@ -1,6 +1,7 @@
 'use client';
 
 import { Container, Box, Typography, Alert, Snackbar, Paper } from '@mui/material';
+import { useEffect } from 'react';
 import ChunkViewDialog from '@/components/text-split/ChunkViewDialog';
 import DatasetHeader from '@/components/datasets/DatasetHeader';
 import DatasetMetadata from '@/components/datasets/DatasetMetadata';
@@ -127,6 +128,7 @@ export default function DatasetDetailsPage({ params }) {
               }}
               onOptimize={handleOpenOptimizeDialog}
               tokenCount={answerTokens}
+              optimizing={optimizeDialog.loading}
             />
 
             <EditableField
@@ -188,12 +190,7 @@ export default function DatasetDetailsPage({ params }) {
       </Snackbar>
 
       {/* AI优化对话框 */}
-      <OptimizeDialog
-        open={optimizeDialog.open}
-        onClose={handleCloseOptimizeDialog}
-        onConfirm={handleOptimize}
-        loading={optimizeDialog.loading}
-      />
+      <OptimizeDialog open={optimizeDialog.open} onClose={handleCloseOptimizeDialog} onConfirm={handleOptimize} />
 
       {/* 文本块详情对话框 */}
       <ChunkViewDialog open={viewDialogOpen} chunk={viewChunk} onClose={handleCloseViewDialog} />

@@ -1,7 +1,16 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Box, Typography, Button, TextField, IconButton, Switch, FormControlLabel } from '@mui/material';
+import {
+  Box,
+  Typography,
+  Button,
+  TextField,
+  IconButton,
+  Switch,
+  FormControlLabel,
+  CircularProgress
+} from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
 import ReactMarkdown from 'react-markdown';
@@ -22,7 +31,8 @@ export default function EditableField({
   onSave,
   onCancel,
   onOptimize,
-  tokenCount
+  tokenCount,
+  optimizing = false
 }) {
   const { t } = useTranslation();
   const theme = useTheme();
@@ -100,16 +110,30 @@ export default function EditableField({
         )}
         {!editing && (
           <>
-            <IconButton size="small" onClick={onEdit}>
+            <IconButton size="small" onClick={onEdit} disabled={optimizing}>
               <EditIcon fontSize="small" />
             </IconButton>
             {onOptimize && (
-              <IconButton size="small" onClick={onOptimize} sx={{ ml: 0.5 }}>
-                <AutoFixHighIcon fontSize="small" />
+              <IconButton
+                size="small"
+                onClick={onOptimize}
+                disabled={optimizing}
+                sx={{ ml: 0.5, position: 'relative' }}
+                title={`optimizing=${optimizing}`}
+              >
+                {optimizing ? <CircularProgress size={20} /> : <AutoFixHighIcon fontSize="small" />}
               </IconButton>
             )}
             <FormControlLabel
-              control={<Switch size="small" checked={useMarkdown} onChange={toggleMarkdown} sx={{ ml: 1 }} />}
+              control={
+                <Switch
+                  size="small"
+                  checked={useMarkdown}
+                  onChange={toggleMarkdown}
+                  sx={{ ml: 1 }}
+                  disabled={optimizing}
+                />
+              }
               label={<Typography variant="caption">{useMarkdown ? 'Markdown' : 'Text'}</Typography>}
               sx={{ ml: 1 }}
             />
