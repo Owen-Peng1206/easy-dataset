@@ -120,7 +120,7 @@ export default function TaskSettings({ projectId }) {
                   <InputLabel id="split-type-label">{t('settings.splitType')}</InputLabel>
                   <Select
                     labelId="split-type-label"
-                    value={taskSettings.splitType || 'markdown'}
+                    value={taskSettings.splitType || 'recursive'}
                     label={t('settings.splitType')}
                     name="splitType"
                     onChange={handleSettingChange}
@@ -184,7 +184,7 @@ export default function TaskSettings({ projectId }) {
                       {t('settings.minLength')}: {taskSettings.textSplitMinLength}
                     </Typography>
                     <Slider
-                      value={taskSettings.textSplitMinLength || 1500}
+                      value={taskSettings.textSplitMinLength || 2000}
                       onChange={handleSliderChange('textSplitMinLength')}
                       aria-labelledby="text-split-min-length-slider"
                       valueLabelDisplay="auto"
@@ -198,14 +198,14 @@ export default function TaskSettings({ projectId }) {
                       {t('settings.maxLength')}: {taskSettings.textSplitMaxLength}
                     </Typography>
                     <Slider
-                      value={taskSettings.textSplitMaxLength || 2000}
+                      value={taskSettings.textSplitMaxLength || 3000}
                       onChange={handleSliderChange('textSplitMaxLength')}
                       aria-labelledby="text-split-max-length-slider"
                       valueLabelDisplay="auto"
                       step={100}
                       marks
-                      min={1000}
-                      max={10000}
+                      min={2000}
+                      max={20000}
                     />
                   </>
                 )}
@@ -214,17 +214,17 @@ export default function TaskSettings({ projectId }) {
                 {taskSettings.splitType && taskSettings.splitType !== 'markdown' && (
                   <>
                     <Typography id="chunk-size-slider" gutterBottom>
-                      {t('settings.chunkSize')}: {taskSettings.chunkSize || 1500}
+                      {t('settings.chunkSize')}: {taskSettings.chunkSize || 3000}
                     </Typography>
                     <Slider
-                      value={taskSettings.chunkSize || 1500}
+                      value={taskSettings.chunkSize || 3000}
                       onChange={handleSliderChange('chunkSize')}
                       aria-labelledby="chunk-size-slider"
                       valueLabelDisplay="auto"
                       step={100}
                       marks
                       min={500}
-                      max={8000}
+                      max={20000}
                     />
 
                     <Typography id="chunk-overlap-slider" gutterBottom sx={{ mt: 3 }}>
