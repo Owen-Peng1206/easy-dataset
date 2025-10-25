@@ -1,16 +1,18 @@
 'use client';
 
-import { Box, Typography, Checkbox, Button, Select, MenuItem, Tooltip, Menu, IconButton } from '@mui/material';
+import { Box, Typography, Checkbox, Button, Select, MenuItem, Tooltip, Menu, IconButton, Badge } from '@mui/material';
 import QuizIcon from '@mui/icons-material/Quiz';
 import DownloadIcon from '@mui/icons-material/Download';
 import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
 import CleaningServicesIcon from '@mui/icons-material/CleaningServices';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import EditIcon from '@mui/icons-material/Edit';
+import FilterListIcon from '@mui/icons-material/FilterList';
 import axios from 'axios';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
+import ChunkFilterDialog from './ChunkFilterDialog';
 
 export default function ChunkListHeader({
   projectId,
@@ -22,13 +24,18 @@ export default function ChunkListHeader({
   questionFilter,
   setQuestionFilter,
   chunks = [], // 添加chunks参数，用于导出文本块
-  selectedModel = {}
+  selectedModel = {},
+  onFilterChange = null,
+  activeFilterCount = 0
 }) {
   const { t, i18n } = useTranslation();
 
   // 添加更多菜单的状态和锚点
   const [moreMenuAnchorEl, setMoreMenuAnchorEl] = useState(null);
   const isMoreMenuOpen = Boolean(moreMenuAnchorEl);
+
+  // 添加筛选对话框状态
+  const [filterDialogOpen, setFilterDialogOpen] = useState(false);
 
   // 打开更多菜单
   const handleMoreMenuClick = event => {
@@ -176,11 +183,20 @@ export default function ChunkListHeader({
           width: { xs: '100%', md: 'auto' }
         }}
       >
-        <Select value={questionFilter} onChange={setQuestionFilter} size="small" sx={{ minWidth: 150 }}>
-          <MenuItem value="all">{t('textSplit.allChunks')}</MenuItem>
-          <MenuItem value="generated">{t('textSplit.generatedQuestions2')}</MenuItem>
-          <MenuItem value="ungenerated">{t('textSplit.ungeneratedQuestions')}</MenuItem>
-        </Select>
+        {/* 更多筛选按钮 */}
+        <Tooltip title={t('textSplit.moreFilters', { defaultValue: '更多筛选' })}>
+          <Badge badgeContent={activeFilterCount} color="error" overlap="circular">
+            <Button
+              variant="outlined"
+              startIcon={<FilterListIcon />}
+              onClick={() => setFilterDialogOpen(true)}
+              size="small"
+              sx={{ borderRadius: 1 }}
+            >
+              {t('textSplit.moreFilters', { defaultValue: '更多筛选' })}
+            </Button>
+          </Badge>
+        </Tooltip>
 
         <Box
           sx={{
@@ -279,6 +295,9 @@ export default function ChunkListHeader({
           </Menu>
         </Box>
       </Box>
+
+      {/* 筛选对话框 */}
+      <ChunkFilterDialog open={filterDialogOpen} onClose={() => setFilterDialogOpen(false)} onApply={onFilterChange} />
     </Box>
   );
 }
