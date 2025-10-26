@@ -474,6 +474,7 @@ export default function DistillPage() {
               tags={tags}
               onGenerateSubTags={handleOpenTagDialog}
               onGenerateQuestions={handleOpenQuestionDialog}
+              onTagsUpdate={setTags}
             />
           </Box>
         )}
