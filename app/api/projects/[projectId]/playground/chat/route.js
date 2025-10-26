@@ -51,13 +51,13 @@ export async function POST(request, { params }) {
     // 调用LLM API
     let response = '';
     try {
-      const { answer, cot } = await llmClient.getResponseWithCOT(formattedMessages);
+      const { answer, cot } = await llmClient.getResponseWithCOT(formattedMessages.filter(f => f.role !== 'error'));
       response = `<think>${cot}</think>${answer}`;
     } catch (error) {
       console.error('Failed to call LLM API:', String(error));
       return NextResponse.json(
         {
-          error: `Failed to call ${model.provider} model: ${error.message}`
+          error: `Failed to call ${model.modelId} model: ${error.message}`
         },
         { status: 500 }
       );
