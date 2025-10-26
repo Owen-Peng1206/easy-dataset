@@ -21,9 +21,10 @@ export async function GET(request, { params }) {
     let answered = undefined;
     if (status === 'answered') answered = true;
     if (status === 'unanswered') answered = false;
+    const chunkName = searchParams.get('chunkName');
     let selectedAll = searchParams.get('selectedAll');
     if (selectedAll) {
-      let data = await getQuestionsIds(projectId, answered, searchParams.get('input'));
+      let data = await getQuestionsIds(projectId, answered, searchParams.get('input'), chunkName);
       return NextResponse.json(data);
     }
     let all = searchParams.get('all');
@@ -37,7 +38,8 @@ export async function GET(request, { params }) {
       parseInt(searchParams.get('page')),
       parseInt(searchParams.get('size')),
       answered,
-      searchParams.get('input')
+      searchParams.get('input'),
+      chunkName
     );
 
     return NextResponse.json(questions);

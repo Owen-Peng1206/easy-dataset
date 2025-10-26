@@ -37,19 +37,22 @@ export default function QuestionsPage({ params }) {
     answerFilter,
     searchTerm,
     debouncedSearchTerm,
+    chunkNameFilter,
+    debouncedChunkNameFilter,
     selectedQuestions,
     setSelectedQuestions,
     handleSelectQuestion,
     handleSelectAll,
     handleSearchChange,
-    handleFilterChange
+    handleFilterChange,
+    handleChunkNameFilterChange
   } = useQuestionsFilter(projectId);
 
   const getQuestionList = async () => {
     try {
       // 获取问题列表
       const questionsResponse = await axios.get(
-        `/api/projects/${projectId}/questions?page=${currentPage}&size=10&status=${answerFilter}&input=${searchTerm}`
+        `/api/projects/${projectId}/questions?page=${currentPage}&size=10&status=${answerFilter}&input=${searchTerm}&chunkName=${encodeURIComponent(debouncedChunkNameFilter)}`
       );
       if (questionsResponse.status !== 200) {
         throw new Error(t('common.fetchError'));
@@ -72,7 +75,7 @@ export default function QuestionsPage({ params }) {
 
   useEffect(() => {
     getQuestionList();
-  }, [currentPage, answerFilter, debouncedSearchTerm]);
+  }, [currentPage, answerFilter, debouncedSearchTerm, debouncedChunkNameFilter]);
 
   const { taskSettings } = useTaskSettings(projectId);
 
@@ -230,6 +233,8 @@ export default function QuestionsPage({ params }) {
           onSearchChange={handleSearchChange}
           answerFilter={answerFilter}
           onFilterChange={handleFilterChange}
+          chunkNameFilter={chunkNameFilter}
+          onChunkNameFilterChange={handleChunkNameFilterChange}
         />
 
         <Divider />

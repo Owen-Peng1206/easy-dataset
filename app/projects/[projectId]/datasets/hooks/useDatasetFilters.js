@@ -15,6 +15,7 @@ export function useDatasetFilters(projectId) {
   const [filterScoreRange, setFilterScoreRange] = useState([0, 5]);
   const [filterCustomTag, setFilterCustomTag] = useState('');
   const [filterNoteKeyword, setFilterNoteKeyword] = useState('');
+  const [filterChunkName, setFilterChunkName] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [searchField, setSearchField] = useState('question');
   const [isInitialized, setIsInitialized] = useState(false);
@@ -32,6 +33,7 @@ export function useDatasetFilters(projectId) {
           setFilterScoreRange(filters.filterScoreRange || [0, 5]);
           setFilterCustomTag(filters.filterCustomTag || '');
           setFilterNoteKeyword(filters.filterNoteKeyword || '');
+          setFilterChunkName(filters.filterChunkName || '');
           setSearchQuery(filters.searchQuery || '');
           setSearchField(filters.searchField || 'question');
         }
@@ -53,6 +55,7 @@ export function useDatasetFilters(projectId) {
           filterScoreRange,
           filterCustomTag,
           filterNoteKeyword,
+          filterChunkName,
           searchQuery,
           searchField
         };
@@ -69,6 +72,7 @@ export function useDatasetFilters(projectId) {
     filterScoreRange,
     filterCustomTag,
     filterNoteKeyword,
+    filterChunkName,
     searchQuery,
     searchField,
     isInitialized
@@ -84,6 +88,7 @@ export function useDatasetFilters(projectId) {
     setFilterScoreRange([0, 5]);
     setFilterCustomTag('');
     setFilterNoteKeyword('');
+    setFilterChunkName('');
     setSearchQuery('');
     setSearchField('question');
   };
@@ -114,6 +119,7 @@ export function useDatasetFilters(projectId) {
     if (filterScoreRange[0] > 0 || filterScoreRange[1] < 5) count++;
     if (filterCustomTag) count++;
     if (filterNoteKeyword) count++;
+    if (filterChunkName) count++;
 
     return count;
   };
@@ -132,6 +138,8 @@ export function useDatasetFilters(projectId) {
     setFilterCustomTag,
     filterNoteKeyword,
     setFilterNoteKeyword,
+    filterChunkName,
+    setFilterChunkName,
     searchQuery,
     setSearchQuery,
     searchField,

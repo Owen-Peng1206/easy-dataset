@@ -18,7 +18,11 @@ export default function QuestionsFilter({
 
   // 过滤相关
   answerFilter,
-  onFilterChange
+  onFilterChange,
+
+  // 文本块名称筛选
+  chunkNameFilter,
+  onChunkNameFilterChange
 }) {
   const { t } = useTranslation();
   const theme = useTheme();
@@ -47,7 +51,7 @@ export default function QuestionsFilter({
         </Box>
 
         {/* 搜索和过滤区域 */}
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
           <TextField
             placeholder={t('questions.searchPlaceholder')}
             variant="outlined"
@@ -56,6 +60,21 @@ export default function QuestionsFilter({
             sx={{ width: { xs: '100%', sm: 300 } }}
             value={searchTerm}
             onChange={onSearchChange}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon fontSize="small" color="action" />
+                </InputAdornment>
+              )
+            }}
+          />
+          <TextField
+            placeholder={t('questions.filterChunkNamePlaceholder')}
+            variant="outlined"
+            size="small"
+            sx={{ width: { xs: '100%', sm: 200 } }}
+            value={chunkNameFilter}
+            onChange={onChunkNameFilterChange}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">

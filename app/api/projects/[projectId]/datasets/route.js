@@ -57,6 +57,7 @@ export async function GET(request, { params }) {
     const scoreRange = searchParams.get('scoreRange');
     const customTag = searchParams.get('customTag');
     const noteKeyword = searchParams.get('noteKeyword');
+    const chunkName = searchParams.get('chunkName');
     let confirmed = undefined;
     if (status === 'confirmed') confirmed = true;
     if (status === 'unconfirmed') confirmed = false;
@@ -73,7 +74,8 @@ export async function GET(request, { params }) {
         isDistill,
         scoreRange,
         customTag,
-        noteKeyword
+        noteKeyword,
+        chunkName
       );
       return NextResponse.json(data);
     }
@@ -90,7 +92,8 @@ export async function GET(request, { params }) {
       isDistill, // 传递蒸馏数据集筛选参数
       scoreRange, // 传递评分范围筛选参数
       customTag, // 传递自定义标签筛选参数
-      noteKeyword // 传递备注关键字筛选参数
+      noteKeyword, // 传递备注关键字筛选参数
+      chunkName // 传递文本块名称筛选参数
     );
 
     return NextResponse.json(datasets);

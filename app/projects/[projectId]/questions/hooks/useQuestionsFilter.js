@@ -8,7 +8,9 @@ export function useQuestionsFilter(projectId) {
   // 过滤和搜索状态
   const [answerFilter, setAnswerFilter] = useState('all'); // 'all', 'answered', 'unanswered'
   const [searchTerm, setSearchTerm] = useState('');
+  const [chunkNameFilter, setChunkNameFilter] = useState('');
   const debouncedSearchTerm = useDebounce(searchTerm);
+  const debouncedChunkNameFilter = useDebounce(chunkNameFilter);
 
   // 选择状态
   const [selectedQuestions, setSelectedQuestions] = useState([]);
@@ -52,6 +54,11 @@ export function useQuestionsFilter(projectId) {
     setAnswerFilter(event.target.value);
   };
 
+  // 处理文本块名称筛选变化
+  const handleChunkNameFilterChange = event => {
+    setChunkNameFilter(event.target.value);
+  };
+
   // 清空选择
   const clearSelection = () => {
     setSelectedQuestions([]);
@@ -61,6 +68,7 @@ export function useQuestionsFilter(projectId) {
   const resetFilters = () => {
     setSearchTerm('');
     setAnswerFilter('all');
+    setChunkNameFilter('');
     setSelectedQuestions([]);
   };
 
@@ -69,16 +77,20 @@ export function useQuestionsFilter(projectId) {
     answerFilter,
     searchTerm,
     debouncedSearchTerm,
+    chunkNameFilter,
+    debouncedChunkNameFilter,
     selectedQuestions,
 
     // 方法
     setAnswerFilter,
     setSearchTerm,
+    setChunkNameFilter,
     setSelectedQuestions,
     handleSelectQuestion,
     handleSelectAll,
     handleSearchChange,
     handleFilterChange,
+    handleChunkNameFilterChange,
     clearSelection,
     resetFilters
   };

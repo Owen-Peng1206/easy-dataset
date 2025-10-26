@@ -57,6 +57,8 @@ export default function DatasetsPage({ params }) {
     setFilterCustomTag,
     filterNoteKeyword,
     setFilterNoteKeyword,
+    filterChunkName,
+    setFilterChunkName,
     searchQuery,
     setSearchQuery,
     searchField,
@@ -141,6 +143,10 @@ export default function DatasetsPage({ params }) {
         url += `&noteKeyword=${encodeURIComponent(filterNoteKeyword)}`;
       }
 
+      if (filterChunkName) {
+        url += `&chunkName=${encodeURIComponent(filterChunkName)}`;
+      }
+
       const response = await axios.get(url);
       setDatasets(response.data);
     } catch (error) {
@@ -167,20 +173,7 @@ export default function DatasetsPage({ params }) {
       }
     };
     fetchAvailableTags();
-  }, [
-    projectId,
-    page,
-    rowsPerPage,
-    filterConfirmed,
-    debouncedSearchQuery,
-    searchField,
-    filterHasCot,
-    filterIsDistill,
-    filterScoreRange,
-    filterCustomTag,
-    filterNoteKeyword,
-    isInitialized
-  ]);
+  }, [projectId, page, rowsPerPage, debouncedSearchQuery, searchField, isInitialized]);
 
   // 处理页码变化
   const handlePageChange = (event, newPage) => {
@@ -541,6 +534,7 @@ export default function DatasetsPage({ params }) {
         filterScoreRange={filterScoreRange}
         filterCustomTag={filterCustomTag}
         filterNoteKeyword={filterNoteKeyword}
+        filterChunkName={filterChunkName}
         availableTags={availableTags}
         onFilterConfirmedChange={setFilterConfirmed}
         onFilterHasCotChange={setFilterHasCot}
@@ -548,6 +542,7 @@ export default function DatasetsPage({ params }) {
         onFilterScoreRangeChange={setFilterScoreRange}
         onFilterCustomTagChange={setFilterCustomTag}
         onFilterNoteKeywordChange={setFilterNoteKeyword}
+        onFilterChunkNameChange={setFilterChunkName}
         onResetFilters={() => {
           setFilterConfirmed('all');
           setFilterHasCot('all');
@@ -555,6 +550,7 @@ export default function DatasetsPage({ params }) {
           setFilterScoreRange([0, 5]);
           setFilterCustomTag('');
           setFilterNoteKeyword('');
+          setFilterChunkName('');
           getDatasetsList();
         }}
         onApplyFilters={() => {
