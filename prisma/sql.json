@@ -34,5 +34,17 @@
   {
     "version": "1.5.0",
     "sql": "CREATE TABLE IF NOT EXISTS DatasetConversations (\n  id VARCHAR(255) NOT NULL,\n  projectId VARCHAR(255) NOT NULL,\n  questionId VARCHAR(255) NOT NULL,\n  question TEXT NOT NULL,\n  chunkId VARCHAR(255) NOT NULL,\n  model VARCHAR(255) NOT NULL,\n  questionLabel VARCHAR(255) NOT NULL,\n  score REAL DEFAULT 0 NOT NULL,\n  aiEvaluation TEXT DEFAULT '' NOT NULL,\n  tags TEXT DEFAULT '' NOT NULL,\n  note TEXT DEFAULT '' NOT NULL,\n  scenario TEXT NOT NULL,\n  roleA TEXT NOT NULL,\n  roleB TEXT NOT NULL,\n  turnCount INT NOT NULL,\n  maxTurns INT NOT NULL,\n  rawMessages TEXT NOT NULL,\n  confirmed BOOLEAN DEFAULT 0 NOT NULL,\n  createAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n  updateAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n  PRIMARY KEY (id),\n  FOREIGN KEY (projectId) REFERENCES Projects(id) ON DELETE CASCADE\n);\n\nCREATE INDEX idx_datasetconversations_projectId ON DatasetConversations(projectId);"
+  },
+  {
+    "version": "1.6.0",
+    "sql": "CREATE TABLE IF NOT EXISTS Images (\n  id VARCHAR(255) NOT NULL,\n  projectId VARCHAR(255) NOT NULL,\n  imageName VARCHAR(255) NOT NULL,\n  path TEXT NOT NULL,\n  size INT NOT NULL,\n  width INT NULL,\n  height INT NULL,\n  createAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n  updateAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n  PRIMARY KEY (id),\n  FOREIGN KEY (projectId) REFERENCES Projects(id) ON DELETE CASCADE,\n  UNIQUE (projectId, imageName)\n);\n\nCREATE INDEX idx_images_projectId ON Images(projectId);"
+  },
+  {
+    "version": "1.6.0",
+    "sql": "CREATE TABLE IF NOT EXISTS ImageDatasets (\n  id VARCHAR(255) NOT NULL,\n  projectId VARCHAR(255) NOT NULL,\n  imageId VARCHAR(255) NOT NULL,\n  imageName VARCHAR(255) NOT NULL,\n  question TEXT NOT NULL,\n  answer TEXT NOT NULL,\n  model VARCHAR(255) NOT NULL,\n  confirmed BOOLEAN DEFAULT 0 NOT NULL,\n  score REAL DEFAULT 0 NOT NULL,\n  tags TEXT DEFAULT '' NOT NULL,\n  note TEXT DEFAULT '' NOT NULL,\n  createAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n  updateAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n  PRIMARY KEY (id),\n  FOREIGN KEY (projectId) REFERENCES Projects(id) ON DELETE CASCADE,\n  FOREIGN KEY (imageId) REFERENCES Images(id) ON DELETE CASCADE\n);\n\nCREATE INDEX idx_imagedatasets_projectId ON ImageDatasets(projectId);\nCREATE INDEX idx_imagedatasets_imageId ON ImageDatasets(imageId);"
+  },
+  {
+    "version": "1.6.0",
+    "sql": "ALTER TABLE Questions ADD COLUMN imageId VARCHAR(255) NULL;\nALTER TABLE Questions ADD COLUMN imageName VARCHAR(255) NULL;"
   }
 ]

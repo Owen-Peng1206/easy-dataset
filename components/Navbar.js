@@ -43,6 +43,8 @@ import ScienceOutlinedIcon from '@mui/icons-material/ScienceOutlined';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ChatIcon from '@mui/icons-material/Chat';
+import ImageIcon from '@mui/icons-material/Image';
+import SourceIcon from '@mui/icons-material/Source';
 import { toast } from 'sonner';
 import axios from 'axios';
 import { useSetAtom } from 'jotai/index';
@@ -65,6 +67,10 @@ export default function Navbar({ projects = [], currentProject }) {
   // 数据集菜单状态
   const [datasetMenuAnchor, setDatasetMenuAnchor] = useState(null);
   const isDatasetMenuOpen = Boolean(datasetMenuAnchor);
+
+  // 数据源菜单状态
+  const [sourceMenuAnchor, setSourceMenuAnchor] = useState(null);
+  const isSourceMenuOpen = Boolean(sourceMenuAnchor);
 
   // 处理更多菜单打开
   const handleMoreMenuOpen = event => {
@@ -99,6 +105,21 @@ export default function Navbar({ projects = [], currentProject }) {
   // 处理数据集菜单区域的鼠标离开
   const handleDatasetMenuMouseLeave = () => {
     setDatasetMenuAnchor(null);
+  };
+
+  // 处理数据源菜单悬浮打开
+  const handleSourceMenuHover = event => {
+    setSourceMenuAnchor(event.currentTarget);
+  };
+
+  // 关闭数据源菜单
+  const handleSourceMenuClose = () => {
+    setSourceMenuAnchor(null);
+  };
+
+  // 处理数据源菜单区域的鼠标离开
+  const handleSourceMenuMouseLeave = () => {
+    setSourceMenuAnchor(null);
   };
 
   const handleProjectChange = event => {
@@ -238,7 +259,9 @@ export default function Navbar({ projects = [], currentProject }) {
                   ? 'more'
                   : pathname.includes('/datasets') || pathname.includes('/multi-turn')
                     ? 'datasets'
-                    : pathname
+                    : pathname.includes('/text-split') || pathname.includes('/images')
+                      ? 'source'
+                      : pathname
               }
               textColor="inherit"
               indicatorColor="secondary"
@@ -269,14 +292,13 @@ export default function Navbar({ projects = [], currentProject }) {
               <Tab
                 icon={
                   <Box sx={{ mr: 1, display: 'flex', alignItems: 'center' }}>
-                    <DescriptionOutlinedIcon fontSize="small" />
+                    <ArrowDropDownIcon fontSize="small" sx={{ ml: 0.5 }} />
                   </Box>
                 }
                 iconPosition="start"
-                label={t('textSplit.title')}
-                value={`/projects/${selectedProject}/text-split`}
-                component={Link}
-                href={`/projects/${selectedProject}/text-split`}
+                label={t('common.dataSource')}
+                value="source"
+                onMouseEnter={handleSourceMenuHover}
               />
               <Tab
                 icon={
@@ -328,6 +350,48 @@ export default function Navbar({ projects = [], currentProject }) {
           </Box>
         )}
 
+        {/* 数据源菜单 */}
+        <Menu
+          anchorEl={sourceMenuAnchor}
+          open={isSourceMenuOpen}
+          onClose={handleSourceMenuClose}
+          PaperProps={{
+            elevation: 2,
+            sx: { mt: 1.5, borderRadius: 2, minWidth: 180 },
+            onMouseLeave: handleSourceMenuMouseLeave
+          }}
+          transformOrigin={{ horizontal: 'center', vertical: 'top' }}
+          anchorOrigin={{ horizontal: 'center', vertical: 'bottom' }}
+          MenuListProps={{
+            dense: true,
+            onMouseLeave: handleSourceMenuMouseLeave
+          }}
+        >
+          <MenuItem
+            component={Link}
+            href={`/projects/${selectedProject}/text-split`}
+            onClick={handleSourceMenuClose}
+            selected={pathname === `/projects/${selectedProject}/text-split`}
+          >
+            <ListItemIcon>
+              <DescriptionOutlinedIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText primary={t('textSplit.title')} />
+          </MenuItem>
+          <Divider />
+          <MenuItem
+            component={Link}
+            href={`/projects/${selectedProject}/images`}
+            onClick={handleSourceMenuClose}
+            selected={pathname === `/projects/${selectedProject}/images`}
+          >
+            <ListItemIcon>
+              <ImageIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText primary={t('images.title')} />
+          </MenuItem>
+        </Menu>
+
         {/* 数据集菜单 */}
         <Menu
           anchorEl={datasetMenuAnchor}
@@ -356,6 +420,7 @@ export default function Navbar({ projects = [], currentProject }) {
             </ListItemIcon>
             <ListItemText primary={t('datasets.singleTurn', '单轮问答数据集')} />
           </MenuItem>
+          <Divider />
           <MenuItem
             component={Link}
             href={`/projects/${selectedProject}/multi-turn`}

@@ -13,7 +13,6 @@ import {
   Divider,
   Paper,
   CircularProgress,
-  Button,
   TextField
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -46,13 +45,13 @@ export default function QuestionListView({
 
   // 获取文本块的标题
   const getChunkTitle = content => {
-    const firstLine = content.split('\n')[0].trim();
+    const firstLine = content ? content.split('\n')[0].trim() : '';
     if (firstLine.startsWith('# ')) {
       return firstLine.substring(2);
     } else if (firstLine.length > 0) {
       return firstLine.length > 200 ? firstLine.substring(0, 200) + '...' : firstLine;
     }
-    return t('chunks.defaultTitle');
+    return '';
   };
 
   // 检查问题是否被选中
@@ -176,7 +175,7 @@ export default function QuestionListView({
               variant="body2"
               sx={{ fontWeight: 500, width: 150, mr: 2, display: { xs: 'none', md: 'block' } }}
             >
-              {t('chunks.title')}
+              {t('common.dataSource')}
             </Typography>
             <Typography variant="body2" sx={{ fontWeight: 500, width: 100, textAlign: 'center' }}>
               {t('common.actions')}
@@ -246,9 +245,13 @@ export default function QuestionListView({
                 </Box>
 
                 <Box sx={{ width: 150, mr: 2, display: { xs: 'none', md: 'block' } }}>
-                  <Tooltip title={getChunkTitle(question.chunk.content)}>
+                  <Tooltip title={getChunkTitle(question.chunk?.content)}>
                     <Chip
-                      label={question.chunk.name}
+                      label={
+                        question.imageId
+                          ? `Image: ${question.imageName}`
+                          : `${t('chunks.title')}: ${question.chunk?.name}`
+                      }
                       size="small"
                       variant="outlined"
                       color="info"

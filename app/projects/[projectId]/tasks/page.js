@@ -11,29 +11,6 @@ import { toast } from 'sonner';
 import TaskFilters from '@/components/tasks/TaskFilters';
 import TasksTable from '@/components/tasks/TasksTable';
 
-/**
- * 任务管理页面
- * 支持任务列表查看、筛选、中断和删除操作
- * 分页展示、国际化支持
- */
-
-// 任务状态映射
-const TASK_STATUS = {
-  0: { label: '处理中', color: 'warning' },
-  1: { label: '已完成', color: 'success' },
-  2: { label: '失败', color: 'error' },
-  3: { label: '已中断', color: 'default' }
-};
-
-// 任务类型映射
-const TASK_TYPES = {
-  'text-processing': '文献处理',
-  'question-generation': '问题生成',
-  'answer-generation': '答案生成',
-  'data-distillation': '数据蒸馏',
-  'pdf-processing': 'PDF解析'
-};
-
 export default function TasksPage({ params }) {
   const { projectId } = params;
   const { t } = useTranslation();

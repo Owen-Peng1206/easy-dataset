@@ -1,6 +1,6 @@
 {
   "name": "easy-dataset",
-  "version": "1.5.1",
+  "version": "1.6.0",
   "private": true,
   "author": {
     "name": "ConardLi",
@@ -70,6 +70,7 @@
     "github-markdown-css": "^5.8.1",
     "i18next": "^24.2.2",
     "i18next-browser-languagedetector": "^8.0.4",
+    "image-size": "^2.0.2",
     "jotai": "^2.12.3",
     "jsonrepair": "^3.13.1",
     "jszip": "^3.10.1",
