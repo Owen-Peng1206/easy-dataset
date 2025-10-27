@@ -163,7 +163,8 @@
     "noTagSelected": "Please select a tag",
     "generateSingleTurnDataset": "Generate Single-turn Dataset",
     "generateSingleTurnDatasetDesc": "Generate Q&A dataset based on questions",
-    "generateMultiTurnDataset": "Generate Multi-turn Dataset",
+    "generateMultiTurnDataset": "Generate Multi-Turn Dataset",
+    "generateImageDataset": "Generate Image Q&A Dataset",
     "generateMultiTurnDatasetDesc": "Generate multi-turn conversation dataset based on questions",
     "deleteConfirm": "Are you sure you want to delete this question? This action cannot be undone."
   },
@@ -961,7 +962,10 @@
       "minutes": "{{minutes}}m {{seconds}}s",
       "hours": "{{hours}}h {{minutes}}m"
     },
-    "fetchFailed": "Failed to fetch task list"
+    "fetchFailed": "Failed to fetch task list",
+    "createSuccess": "Task created successfully",
+    "createFailed": "Failed to create task",
+    "multiTurnCreateSuccess": "Multi-turn conversation dataset task created successfully"
   },
   "gaPairs": {
     "title": "Genre-Audience Pairs Management",

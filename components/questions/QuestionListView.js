@@ -60,13 +60,19 @@ export default function QuestionListView({
   };
 
   // 处理生成数据集
-  const handleGenerateDataset = async (questionId, questionInfo) => {
+  const handleGenerateDataset = async (questionId, questionInfo, imageId, imageName) => {
     // 设置处理状态
     setProcessingQuestions(prev => ({
       ...prev,
       [questionId]: true
     }));
-    await generateSingleDataset({ projectId, questionId, questionInfo });
+    await generateSingleDataset({
+      projectId,
+      questionId,
+      questionInfo,
+      imageId,
+      imageName
+    });
     // 重置处理状态
     setProcessingQuestions(prev => ({
       ...prev,
@@ -286,7 +292,9 @@ export default function QuestionListView({
                     <IconButton
                       size="small"
                       color="primary"
-                      onClick={() => handleGenerateDataset(question.id, question.question)}
+                      onClick={() =>
+                        handleGenerateDataset(question.id, question.question, question.imageId, question.imageName)
+                      }
                       disabled={processingQuestions[questionKey]}
                     >
                       {processingQuestions[questionKey] ? (
@@ -296,20 +304,24 @@ export default function QuestionListView({
                       )}
                     </IconButton>
                   </Tooltip>
-                  <Tooltip title={t('questions.generateMultiTurn', '生成多轮对话')}>
-                    <IconButton
-                      size="small"
-                      color="secondary"
-                      onClick={() => handleGenerateMultiTurnDataset(question.id, question.question)}
-                      disabled={processingQuestions[`${questionKey}_multi`]}
-                    >
-                      {processingQuestions[`${questionKey}_multi`] ? (
-                        <CircularProgress size={16} />
-                      ) : (
-                        <ChatIcon fontSize="small" />
-                      )}
-                    </IconButton>
-                  </Tooltip>
+
+                  {!question.imageId && (
+                    <Tooltip title={t('questions.generateMultiTurn', '生成多轮对话')}>
+                      <IconButton
+                        size="small"
+                        color="secondary"
+                        onClick={() => handleGenerateMultiTurnDataset(question.id, question.question)}
+                        disabled={processingQuestions[`${questionKey}_multi`]}
+                      >
+                        {processingQuestions[`${questionKey}_multi`] ? (
+                          <CircularProgress size={16} />
+                        ) : (
+                          <ChatIcon fontSize="small" />
+                        )}
+                      </IconButton>
+                    </Tooltip>
+                  )}
+
                   <Tooltip title={t('common.delete')}>
                     <IconButton
                       size="small"

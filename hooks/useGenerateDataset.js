@@ -11,32 +11,61 @@ export function useGenerateDataset() {
   const { t } = useTranslation();
 
   const generateSingleDataset = useCallback(
-    async ({ projectId, questionId, questionInfo }) => {
+    async ({ projectId, questionId, questionInfo, imageId, imageName }) => {
       // 获取模型参数
       if (!model) {
         toast.error(t('models.configNotFound'));
         return null;
       }
+
+      // 判断是否为图片问题
+      const isImageQuestion = !!imageId;
+
       // 调用API生成数据集
       const currentLanguage = i18n.language === 'zh-CN' ? '中文' : 'en';
-      toast.promise(
-        axios.post(`/api/projects/${projectId}/datasets`, {
-          questionId,
-          model,
-          language: currentLanguage
-        }),
-        {
-          loading: t('datasets.generating'),
-          description: `问题：【${questionInfo}】`,
-          position: 'top-right',
-          success: data => {
-            return '生成数据集成功';
-          },
-          error: error => {
-            return t('datasets.generateFailed', { error: error.response?.data?.error });
+
+      if (isImageQuestion) {
+        // 图片问题：调用图片数据集生成接口
+        toast.promise(
+          axios.post(`/api/projects/${projectId}/images/datasets`, {
+            imageName,
+            question: questionInfo,
+            model,
+            language: currentLanguage
+          }),
+          {
+            loading: t('datasets.generating'),
+            description: `图片：【${imageName}】\n问题：【${questionInfo}】`,
+            position: 'top-right',
+            success: data => {
+              return '生成数据集成功';
+            },
+            error: error => {
+              return t('datasets.generateFailed', { error: error.response?.data?.error });
+            }
           }
-        }
-      );
+        );
+      } else {
+        // 文本问题：调用普通数据集生成接口
+        toast.promise(
+          axios.post(`/api/projects/${projectId}/datasets`, {
+            questionId,
+            model,
+            language: currentLanguage
+          }),
+          {
+            loading: t('datasets.generating'),
+            description: `问题：【${questionInfo}】`,
+            position: 'top-right',
+            success: data => {
+              return '生成数据集成功';
+            },
+            error: error => {
+              return t('datasets.generateFailed', { error: error.response?.data?.error });
+            }
+          }
+        );
+      }
     },
     [model, t]
   );
@@ -51,11 +80,26 @@ export function useGenerateDataset() {
       // 处理每个请求
       const processRequest = async question => {
         try {
-          const response = await axios.post(`/api/projects/${projectId}/datasets`, {
-            questionId: question.id,
-            model,
-            language: i18n.language === 'zh-CN' ? '中文' : 'en'
-          });
+          const isImageQuestion = !!question.imageId;
+          let response;
+
+          if (isImageQuestion) {
+            // 图片问题
+            response = await axios.post(`/api/projects/${projectId}/images/datasets`, {
+              imageName: question.imageName,
+              question: question.question,
+              model,
+              language: i18n.language === 'zh-CN' ? '中文' : 'en'
+            });
+          } else {
+            // 文本问题
+            response = await axios.post(`/api/projects/${projectId}/datasets`, {
+              questionId: question.id,
+              model,
+              language: i18n.language === 'zh-CN' ? '中文' : 'en'
+            });
+          }
+
           const data = response.data;
           completed++;
           toast.success(`${question.question} 完成`, { position: 'top-right' });

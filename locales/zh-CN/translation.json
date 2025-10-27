@@ -120,6 +120,7 @@
     "generateSingleTurnDataset": "生成单轮对话数据集",
     "generateSingleTurnDatasetDesc": "基于问题生成问答数据集",
     "generateMultiTurnDataset": "生成多轮对话数据集",
+    "generateImageDataset": "生成图像问答数据集",
     "generateMultiTurnDatasetDesc": "基于问题生成多轮对话数据集",
     "multiTurnNotConfigured": "请先在项目设置中配置多轮对话相关参数",
     "filterAll": "全部问题",
@@ -948,7 +949,10 @@
       "minutes": "{{minutes}}分 {{seconds}}秒",
       "hours": "{{hours}}小时 {{minutes}}分"
     },
-    "fetchFailed": "获取任务列表失败"
+    "fetchFailed": "获取任务列表失败",
+    "createSuccess": "任务创建成功",
+    "createFailed": "任务创建失败",
+    "multiTurnCreateSuccess": "多轮对话数据集任务创建成功"
   },
   "gaPairs": {
     "title": "文体-受众对管理",
