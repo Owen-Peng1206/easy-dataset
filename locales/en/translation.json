@@ -1126,6 +1126,10 @@
     "question": "Question",
     "questionPlaceholder": "Enter your question...",
     "questionRequired": "Please enter a question",
-    "datasetGenerated": "Dataset generated successfully"
+    "datasetGenerated": "Dataset generated successfully",
+    "autoGenerateQuestions": "Auto Generate Questions",
+    "autoGenerateConfirm": "The system will automatically generate questions for all images without questions. This will create a background task, and you can view the progress in Task Management.",
+    "taskCreated": "Task created successfully, processing in background",
+    "taskCreateFailed": "Failed to create task"
   }
 }

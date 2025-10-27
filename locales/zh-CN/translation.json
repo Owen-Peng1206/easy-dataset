@@ -1113,6 +1113,10 @@
     "question": "问题",
     "questionPlaceholder": "请输入您想问的问题...",
     "questionRequired": "请输入问题",
-    "datasetGenerated": "数据集生成成功"
+    "datasetGenerated": "数据集生成成功",
+    "autoGenerateQuestions": "自动提取问题",
+    "autoGenerateConfirm": "系统将为所有未生成问题的图片自动生成问题。此操作将创建一个后台任务，您可以在任务管理中查看进度。",
+    "taskCreated": "任务创建成功，正在后台处理",
+    "taskCreateFailed": "任务创建失败"
   }
 }
