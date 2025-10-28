@@ -18,7 +18,9 @@ import {
   TextField,
   Tabs,
   Tab,
-  Paper
+  Paper,
+  Chip,
+  Card
 } from '@mui/material';
 import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -150,7 +152,7 @@ export default function ImportDialog({ open, projectId, onClose, onSuccess }) {
               {t('images.importTip')}
             </Alert>
 
-            <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
+            <Box sx={{ display: 'flex', gap: 1.5, mb: 3 }}>
               <TextField
                 fullWidth
                 size="small"
@@ -164,37 +166,73 @@ export default function ImportDialog({ open, projectId, onClose, onSuccess }) {
                   }
                 }}
                 disabled={loading}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: 2
+                  }
+                }}
               />
               <Button
                 variant="contained"
                 startIcon={<FolderOpenIcon />}
                 onClick={handleAddDirectory}
                 disabled={loading || !inputPath.trim()}
+                sx={{
+                  borderRadius: 2,
+                  px: 2.5,
+                  fontWeight: 600,
+                  textTransform: 'none',
+                  whiteSpace: 'nowrap',
+                  boxShadow: 1,
+                  transition: 'all 0.2s',
+                  '&:hover:not(:disabled)': {
+                    boxShadow: 2,
+                    transform: 'translateY(-1px)'
+                  }
+                }}
               >
-                {t('common.add')}
+                {t('images.addDirectory', { defaultValue: '添加目录' })}
               </Button>
             </Box>
 
             {directories.length > 0 && (
-              <Box>
-                <Typography variant="subtitle2" gutterBottom>
-                  {t('images.selectedDirectories')} ({directories.length})
-                </Typography>
-                <List dense>
+              <Card
+                sx={{
+                  p: 2.5,
+                  bgcolor: 'background.paper',
+                  border: '1px solid',
+                  borderColor: 'divider',
+                  borderRadius: 2
+                }}
+              >
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  <FolderOpenIcon sx={{ mr: 1, color: 'primary.main' }} />
+                  <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                    {t('images.selectedDirectories')} ({directories.length})
+                  </Typography>
+                </Box>
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
                   {directories.map((dir, index) => (
-                    <ListItem
+                    <Chip
                       key={index}
-                      secondaryAction={
-                        <IconButton edge="end" onClick={() => handleRemoveDirectory(index)} disabled={loading}>
-                          <DeleteIcon />
-                        </IconButton>
-                      }
-                    >
-                      <ListItemText primary={dir} />
-                    </ListItem>
+                      label={dir}
+                      onDelete={() => handleRemoveDirectory(index)}
+                      disabled={loading}
+                      icon={<FolderOpenIcon />}
+                      sx={{
+                        borderRadius: 1.5,
+                        fontWeight: 500,
+                        maxWidth: '100%',
+                        '& .MuiChip-label': {
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap'
+                        }
+                      }}
+                    />
                   ))}
-                </List>
-              </Box>
+                </Box>
+              </Card>
             )}
           </>
         ) : (
