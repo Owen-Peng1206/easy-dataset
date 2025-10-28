@@ -6,7 +6,7 @@ import imageService from '@/lib/services/images';
 export async function POST(request, { params }) {
   try {
     const { projectId } = params;
-    const { imageName, question, model, language = 'zh' } = await request.json();
+    const { imageName, question, model, language = 'zh', previewOnly = false } = await request.json();
 
     if (!imageName || !question) {
       return NextResponse.json({ error: '缺少必要参数' }, { status: 400 });
@@ -24,11 +24,14 @@ export async function POST(request, { params }) {
 
     // 调用图片数据集生成服务
     const result = await imageService.generateDatasetForImage(projectId, image.id, question, {
-      model
+      model,
+      language,
+      previewOnly
     });
 
     return NextResponse.json({
       success: true,
+      answer: result.answer,
       dataset: result.dataset
     });
   } catch (error) {

@@ -16,8 +16,9 @@ export async function GET(request, { params }) {
     const imageName = searchParams.get('imageName') || '';
     const hasQuestions = searchParams.get('hasQuestions');
     const hasDatasets = searchParams.get('hasDatasets');
+    const simple = searchParams.get('simple');
 
-    const result = await getImages(projectId, page, pageSize, imageName, hasQuestions, hasDatasets);
+    const result = await getImages(projectId, page, pageSize, imageName, hasQuestions, hasDatasets, simple);
 
     return NextResponse.json(result);
   } catch (error) {

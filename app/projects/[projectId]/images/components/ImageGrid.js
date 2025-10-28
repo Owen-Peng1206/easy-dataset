@@ -19,6 +19,7 @@ import {
 import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
 import DatasetIcon from '@mui/icons-material/Dataset';
 import DeleteIcon from '@mui/icons-material/Delete';
+import EditNoteIcon from '@mui/icons-material/EditNote';
 import { useTranslation } from 'react-i18next';
 
 export default function ImageGrid({
@@ -29,7 +30,8 @@ export default function ImageGrid({
   onPageChange,
   onGenerateQuestions,
   onGenerateDataset,
-  onDelete
+  onDelete,
+  onAnnotate
 }) {
   const { t } = useTranslation();
   const [previewImage, setPreviewImage] = useState(null);
@@ -86,6 +88,11 @@ export default function ImageGrid({
               </CardContent>
               <CardActions sx={{ justifyContent: 'space-between', px: 2, pb: 2 }}>
                 <Box>
+                  <Tooltip title={t('images.manualAnnotation', { defaultValue: '手动标注' })}>
+                    <IconButton size="small" color="success" onClick={() => onAnnotate(image)}>
+                      <EditNoteIcon />
+                    </IconButton>
+                  </Tooltip>
                   <Tooltip title={t('images.generateQuestions')}>
                     <IconButton size="small" color="primary" onClick={() => onGenerateQuestions(image)}>
                       <QuestionMarkIcon />

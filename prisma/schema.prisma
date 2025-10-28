@@ -9,31 +9,32 @@ datasource db {
 }
 
 model Projects {
-  id                   String                 @id @default(nanoid(12))
-  name                 String
-  description          String
-  globalPrompt         String                 @default("")
-  questionPrompt       String                 @default("")
-  answerPrompt         String                 @default("")
-  labelPrompt          String                 @default("")
-  domainTreePrompt     String                 @default("")
-  cleanPrompt          String                 @default("")
-  defaultModelConfigId String?
-  test                 String                 @default("")
-  createAt             DateTime               @default(now())
-  updateAt             DateTime               @updatedAt
-  Questions            Questions[]
-  Datasets             Datasets[]
-  DatasetConversations DatasetConversations[]
-  Chunks               Chunks[]
-  ModelConfig          ModelConfig[]
-  UploadFiles          UploadFiles[]
-  Tags                 Tags[]
-  Task                 Task[]
-  GaPairs              GaPairs[]
-  CustomPrompts        CustomPrompts[]
-  Images               Images[]
-  ImageDatasets        ImageDatasets[]
+  id                     String                   @id @default(nanoid(12))
+  name                   String
+  description            String
+  globalPrompt           String                   @default("")
+  questionPrompt         String                   @default("")
+  answerPrompt           String                   @default("")
+  labelPrompt            String                   @default("")
+  domainTreePrompt       String                   @default("")
+  cleanPrompt            String                   @default("")
+  defaultModelConfigId   String?
+  test                   String                   @default("")
+  createAt               DateTime                 @default(now())
+  updateAt               DateTime                 @updatedAt
+  Questions              Questions[]
+  Datasets               Datasets[]
+  DatasetConversations   DatasetConversations[]
+  Chunks                 Chunks[]
+  ModelConfig            ModelConfig[]
+  UploadFiles            UploadFiles[]
+  Tags                   Tags[]
+  Task                   Task[]
+  GaPairs                GaPairs[]
+  CustomPrompts          CustomPrompts[]
+  Images                 Images[]
+  ImageDatasets          ImageDatasets[]
+  QuestionTemplates      QuestionTemplates[]
 }
 
 model UploadFiles {
@@ -78,22 +79,25 @@ model Tags {
 }
 
 model Questions {
-  id        String   @id @default(nanoid())
-  project   Projects @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  projectId String
-  chunk     Chunks   @relation(fields: [chunkId], references: [id])
-  chunkId   String
-  gaPair    GaPairs? @relation(fields: [gaPairId], references: [id])
-  gaPairId  String? // Optional: links question to the GA pair that generated it
-  question  String
-  label     String
-  answered  Boolean  @default(false)
-  imageId   String? // Optional: for image-based questions
-  imageName String? // Optional: for image-based questions
-  createAt  DateTime @default(now())
-  updateAt  DateTime @updatedAt
+  id         String   @id @default(nanoid())
+  project    Projects @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId  String
+  chunk      Chunks   @relation(fields: [chunkId], references: [id])
+  chunkId    String
+  gaPair     GaPairs? @relation(fields: [gaPairId], references: [id])
+  gaPairId   String? // Optional: links question to the GA pair that generated it
+  question   String
+  label      String
+  answered   Boolean  @default(false)
+  imageId    String? // Optional: for image-based questions
+  imageName  String? // Optional: for image-based questions
+  templateId String? // Optional: links to ImageQuestionTemplates
+  createAt   DateTime @default(now())
+  updateAt   DateTime @updatedAt
 
   @@index([projectId])
+  @@index([imageId])
+  @@index([templateId])
 }
 
 model Datasets {
@@ -261,22 +265,43 @@ model Images {
 }
 
 model ImageDatasets {
-  id        String   @id @default(nanoid())
-  project   Projects @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  projectId String
-  image     Images   @relation(fields: [imageId], references: [id], onDelete: Cascade)
-  imageId   String
-  imageName String
-  question  String
-  answer    String
-  model     String
-  confirmed Boolean  @default(false)
-  score     Float    @default(0)
-  tags      String   @default("")
-  note      String   @default("")
-  createAt  DateTime @default(now())
-  updateAt  DateTime @updatedAt
+  id         String   @id @default(nanoid())
+  project    Projects @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId  String
+  image      Images   @relation(fields: [imageId], references: [id], onDelete: Cascade)
+  imageId    String
+  imageName  String
+  questionId String? // Optional: links to Questions table
+  question   String
+  answer     String // Stores all answer types: text, JSON array for labels, or custom format JSON
+  answerType String   @default("text") // 'text' | 'label' | 'custom_format'
+  model      String
+  confirmed  Boolean  @default(false)
+  score      Float    @default(0)
+  tags       String   @default("")
+  note       String   @default("")
+  createAt   DateTime @default(now())
+  updateAt   DateTime @updatedAt
 
   @@index([projectId])
   @@index([imageId])
+  @@index([questionId])
+}
+
+model QuestionTemplates {
+  id           String   @id @default(nanoid())
+  project      Projects @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId    String
+  question     String // Question content
+  sourceType   String // 'image' | 'text' - data source type
+  answerType   String // 'text' | 'label' | 'custom_format'
+  description  String   @default("") // Question description
+  labels       String   @default("") // JSON array of label options (for answerType='label')
+  customFormat String   @default("") // Custom format definition (for answerType='custom_format')
+  order        Int      @default(0) // Display order
+  createAt     DateTime @default(now())
+  updateAt     DateTime @updatedAt
+
+  @@index([projectId])
+  @@index([projectId, sourceType])
 }

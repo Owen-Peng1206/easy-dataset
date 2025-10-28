@@ -39,13 +39,17 @@ export function useQuestionEdit(projectId, onSuccess) {
             ? {
                 question: formData.question,
                 chunkId: formData.chunkId,
-                label: formData.label
+                label: formData.label,
+                imageId: formData.imageId,
+                imageName: formData.imageName
               }
             : {
                 id: formData.id,
                 question: formData.question,
                 chunkId: formData.chunkId,
-                label: formData.label
+                label: formData.label,
+                imageId: formData.imageId,
+                imageName: formData.imageName
               }
         )
       });

@@ -275,14 +275,7 @@ export default function QuestionListView({
                     <IconButton
                       size="small"
                       color="primary"
-                      onClick={() =>
-                        onEditQuestion({
-                          id: question.id,
-                          question: question.question,
-                          chunkId: question.chunkId,
-                          label: question.label || 'other'
-                        })
-                      }
+                      onClick={() => onEditQuestion(question)}
                       disabled={processingQuestions[questionKey]}
                     >
                       <EditIcon fontSize="small" />

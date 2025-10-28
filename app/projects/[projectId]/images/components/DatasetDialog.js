@@ -53,9 +53,9 @@ export default function DatasetDialog({ open, projectId, image, onClose, onSucce
       setLoading(true);
       setError('');
 
-      const response = await axios.post(`/api/projects/${projectId}/images/datasets`, {
+      await axios.post(`/api/projects/${projectId}/images/datasets`, {
         imageName: image.imageName,
-        question: question.trim(),
+        question: { question: question.trim() },
         model: selectedModel,
         language: i18n.language
       });

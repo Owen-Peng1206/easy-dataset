@@ -29,7 +29,7 @@ export function useGenerateDataset() {
         toast.promise(
           axios.post(`/api/projects/${projectId}/images/datasets`, {
             imageName,
-            question: questionInfo,
+            question: { question: questionInfo, id: questionId },
             model,
             language: currentLanguage
           }),
@@ -87,7 +87,7 @@ export function useGenerateDataset() {
             // 图片问题
             response = await axios.post(`/api/projects/${projectId}/images/datasets`, {
               imageName: question.imageName,
-              question: question.question,
+              question,
               model,
               language: i18n.language === 'zh-CN' ? '中文' : 'en'
             });

@@ -22,11 +22,16 @@ export default function QuestionsFilter({
 
   // 文本块名称筛选
   chunkNameFilter,
-  onChunkNameFilterChange
+  onChunkNameFilterChange,
+
+  activeTab
 }) {
   const { t } = useTranslation();
   const theme = useTheme();
 
+  if (activeTab === 1) {
+    return <></>;
+  }
   return (
     <Box sx={{ p: 2 }}>
       <Stack
