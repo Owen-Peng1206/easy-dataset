@@ -17,6 +17,7 @@ import {
 } from '@mui/material';
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
+import { imageStyles } from './styles/imageStyles';
 import { toast } from 'sonner';
 import axios from 'axios';
 import { useAtomValue } from 'jotai';
@@ -24,6 +25,7 @@ import { selectedModelInfoAtom } from '@/lib/store';
 
 import ImageFilters from './components/ImageFilters';
 import ImageGrid from './components/ImageGrid';
+import ImageList from './components/ImageList';
 import ImportDialog from './components/ImportDialog';
 import QuestionDialog from './components/QuestionDialog';
 import DatasetDialog from './components/DatasetDialog';
@@ -50,6 +52,9 @@ export default function ImagesPage() {
   const [imageName, setImageName] = useState('');
   const [hasQuestions, setHasQuestions] = useState('all');
   const [hasDatasets, setHasDatasets] = useState('all');
+
+  // 视图模式
+  const [viewMode, setViewMode] = useState('grid');
 
   // 对话框状态
   const [importDialogOpen, setImportDialogOpen] = useState(false);
@@ -236,21 +241,38 @@ export default function ImagesPage() {
   };
 
   return (
-    <Container maxWidth="xl" sx={{ py: 4 }}>
-      <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography variant="h4" component="h1">
-          {t('images.title')}
-        </Typography>
-        <Box sx={{ display: 'flex', gap: 2 }}>
-          <Button variant="outlined" startIcon={<AutoAwesomeIcon />} onClick={handleAutoGenerateQuestions}>
-            {t('images.autoGenerateQuestions')}
+    <Container maxWidth="xl" sx={imageStyles.pageContainer}>
+      {/* 页面头部 */}
+      <Box sx={imageStyles.header}>
+        <Box sx={imageStyles.headerTitle}>
+          <Typography variant="h4" component="h1" sx={imageStyles.title}>
+            {t('images.title', { defaultValue: '图片管理' })}
+          </Typography>
+          <Typography variant="body2" sx={imageStyles.subtitle}>
+            {t('images.subtitle', { defaultValue: '管理项目中的图片资源，生成问题和数据集' })}
+          </Typography>
+        </Box>
+        <Box sx={imageStyles.headerActions}>
+          <Button
+            variant="outlined"
+            startIcon={<AutoAwesomeIcon />}
+            onClick={handleAutoGenerateQuestions}
+            sx={imageStyles.actionButton}
+          >
+            {t('images.autoGenerateQuestions', { defaultValue: 'AI 批量生成问题' })}
           </Button>
-          <Button variant="contained" startIcon={<AddPhotoAlternateIcon />} onClick={() => setImportDialogOpen(true)}>
-            {t('images.importImages')}
+          <Button
+            variant="contained"
+            startIcon={<AddPhotoAlternateIcon />}
+            onClick={() => setImportDialogOpen(true)}
+            sx={imageStyles.actionButton}
+          >
+            {t('images.importImages', { defaultValue: '导入图片' })}
           </Button>
         </Box>
       </Box>
 
+      {/* 筛选区域 */}
       <ImageFilters
         imageName={imageName}
         onImageNameChange={setImageName}
@@ -258,14 +280,29 @@ export default function ImagesPage() {
         onHasQuestionsChange={setHasQuestions}
         hasDatasets={hasDatasets}
         onHasDatasetsChange={setHasDatasets}
+        viewMode={viewMode}
+        onViewModeChange={setViewMode}
       />
 
+      {/* 图片列表 */}
       {loading ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
-          <CircularProgress />
+        <Box sx={imageStyles.loadingContainer}>
+          <CircularProgress size={48} />
         </Box>
-      ) : (
+      ) : viewMode === 'grid' ? (
         <ImageGrid
+          images={images}
+          total={total}
+          page={page}
+          pageSize={pageSize}
+          onPageChange={setPage}
+          onGenerateQuestions={handleGenerateQuestions}
+          onGenerateDataset={handleGenerateDataset}
+          onDelete={handleDeleteImage}
+          onAnnotate={openAnnotation}
+        />
+      ) : (
+        <ImageList
           images={images}
           total={total}
           page={page}
