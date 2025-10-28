@@ -65,10 +65,14 @@ export async function POST(request, { params }) {
           let dimensions = { width: null, height: null };
 
           try {
-            const size = sizeOf(destPath);
-            dimensions = { width: size.width, height: size.height };
+            // 读取文件为 Buffer，然后传递给 sizeOf
+            const imageBuffer = await fs.readFile(destPath);
+            const size = sizeOf(imageBuffer);
+            if (size && size.width && size.height) {
+              dimensions = { width: size.width, height: size.height };
+            }
           } catch (err) {
-            console.warn(`无法获取图片尺寸: ${file}`, err);
+            console.warn(`无法获取图片尺寸: ${file}`, err.message);
           }
 
           importedImages.push({

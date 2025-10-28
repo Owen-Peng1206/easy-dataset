@@ -134,7 +134,12 @@ export default function AnnotationDialog({
                     {image.imageName}
                   </Typography>
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 1 }}>
-                    <Chip label={`${image.width} × ${image.height}`} size="small" variant="outlined" />
+                    {image.width && image.height && (
+                      <Chip label={`${image.width} × ${image.height}`} size="small" variant="outlined" />
+                    )}
+                    {image.size && (
+                      <Chip label={`${(image.size / 1024).toFixed(2)} KB`} size="small" variant="outlined" />
+                    )}
                     {image.format && <Chip label={image.format?.toUpperCase()} size="small" variant="outlined" />}
                   </Box>
                   <Typography variant="body2" color="text.secondary">
