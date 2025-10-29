@@ -54,20 +54,22 @@ export default function QuestionsPage({ params }) {
     debouncedSearchTerm,
     chunkNameFilter,
     debouncedChunkNameFilter,
+    sourceTypeFilter,
     selectedQuestions,
     setSelectedQuestions,
     handleSelectQuestion,
     handleSelectAll,
     handleSearchChange,
     handleFilterChange,
-    handleChunkNameFilterChange
+    handleChunkNameFilterChange,
+    handleSourceTypeFilterChange
   } = useQuestionsFilter(projectId);
 
   const getQuestionList = async () => {
     try {
       // 获取问题列表
       const questionsResponse = await axios.get(
-        `/api/projects/${projectId}/questions?page=${currentPage}&size=10&status=${answerFilter}&input=${searchTerm}&chunkName=${encodeURIComponent(debouncedChunkNameFilter)}`
+        `/api/projects/${projectId}/questions?page=${currentPage}&size=10&status=${answerFilter}&input=${searchTerm}&chunkName=${encodeURIComponent(debouncedChunkNameFilter)}&sourceType=${sourceTypeFilter}`
       );
       if (questionsResponse.status !== 200) {
         throw new Error(t('common.fetchError'));
@@ -90,7 +92,7 @@ export default function QuestionsPage({ params }) {
 
   useEffect(() => {
     getQuestionList();
-  }, [currentPage, answerFilter, debouncedSearchTerm, debouncedChunkNameFilter]);
+  }, [currentPage, answerFilter, debouncedSearchTerm, debouncedChunkNameFilter, sourceTypeFilter]);
 
   const { taskSettings } = useTaskSettings(projectId);
 
@@ -155,6 +157,7 @@ export default function QuestionsPage({ params }) {
       } else {
         await createTemplate(data);
       }
+      getQuestionList();
       handleCloseTemplateDialog();
     } catch (error) {
       console.error('Failed to save template:', error);
@@ -294,6 +297,8 @@ export default function QuestionsPage({ params }) {
           onFilterChange={handleFilterChange}
           chunkNameFilter={chunkNameFilter}
           onChunkNameFilterChange={handleChunkNameFilterChange}
+          sourceTypeFilter={sourceTypeFilter}
+          onSourceTypeFilterChange={handleSourceTypeFilterChange}
           activeTab={activeTab}
         />
 

@@ -75,9 +75,10 @@ export async function POST(request, { params }) {
             console.warn(`无法获取图片尺寸: ${file}`, err.message);
           }
 
+          const projectPath = await getProjectPath(projectId);
           importedImages.push({
             imageName: file,
-            path: `/local-db/${projectId}/images/${file}`,
+            path: `${projectPath}/images/${file}`,
             size: stats.size,
             width: dimensions.width,
             height: dimensions.height

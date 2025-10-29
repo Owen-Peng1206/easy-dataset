@@ -9,6 +9,7 @@ export function useQuestionsFilter(projectId) {
   const [answerFilter, setAnswerFilter] = useState('all'); // 'all', 'answered', 'unanswered'
   const [searchTerm, setSearchTerm] = useState('');
   const [chunkNameFilter, setChunkNameFilter] = useState('');
+  const [sourceTypeFilter, setSourceTypeFilter] = useState('all'); // 'all', 'text', 'image'
   const debouncedSearchTerm = useDebounce(searchTerm);
   const debouncedChunkNameFilter = useDebounce(chunkNameFilter);
 
@@ -38,7 +39,7 @@ export function useQuestionsFilter(projectId) {
       setSelectedQuestions([]);
     } else {
       const response = await axios.get(
-        `/api/projects/${projectId}/questions?status=${answerFilter}&input=${searchTerm}&selectedAll=1`
+        `/api/projects/${projectId}/questions?status=${answerFilter}&input=${searchTerm}&chunkName=${encodeURIComponent(chunkNameFilter)}&sourceType=${sourceTypeFilter}&selectedAll=1`
       );
       setSelectedQuestions(response.data.map(dataset => dataset.id));
     }
@@ -59,6 +60,11 @@ export function useQuestionsFilter(projectId) {
     setChunkNameFilter(event.target.value);
   };
 
+  // 处理数据源类型筛选变化
+  const handleSourceTypeFilterChange = event => {
+    setSourceTypeFilter(event.target.value);
+  };
+
   // 清空选择
   const clearSelection = () => {
     setSelectedQuestions([]);
@@ -69,6 +75,7 @@ export function useQuestionsFilter(projectId) {
     setSearchTerm('');
     setAnswerFilter('all');
     setChunkNameFilter('');
+    setSourceTypeFilter('all');
     setSelectedQuestions([]);
   };
 
@@ -79,18 +86,21 @@ export function useQuestionsFilter(projectId) {
     debouncedSearchTerm,
     chunkNameFilter,
     debouncedChunkNameFilter,
+    sourceTypeFilter,
     selectedQuestions,
 
     // 方法
     setAnswerFilter,
     setSearchTerm,
     setChunkNameFilter,
+    setSourceTypeFilter,
     setSelectedQuestions,
     handleSelectQuestion,
     handleSelectAll,
     handleSearchChange,
     handleFilterChange,
     handleChunkNameFilterChange,
+    handleSourceTypeFilterChange,
     clearSelection,
     resetFilters
   };

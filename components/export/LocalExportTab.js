@@ -57,7 +57,7 @@ const LocalExportTab = ({
   const theme = useTheme();
   const { t } = useTranslation();
 
-  // 平衡导出相关状态
+  // Balance export related state
   const [balanceDialogOpen, setBalanceDialogOpen] = useState(false);
   const [tagStats, setTagStats] = useState([]);
   const [balanceConfig, setBalanceConfig] = useState([]);
@@ -65,7 +65,7 @@ const LocalExportTab = ({
   const [error, setError] = useState('');
   const [totalCount, setTotalCount] = useState(0);
 
-  // 获取标签统计信息（改为 GET + query 参数）
+  // Get label statistics (changed to GET + query parameters)
   const fetchTagStats = async () => {
     try {
       setLoading(true);
@@ -195,16 +195,16 @@ const LocalExportTab = ({
           headers: ['instruction', 'input', 'output', 'system'],
           rows: [
             {
-              instruction: '人类指令（必填）',
+              instruction: t('export.sampleInstruction', '人类指令（必填）'),
               input: '',
-              output: '模型回答（必填）',
-              system: '系统提示词（选填）'
+              output: t('export.sampleOutput', '模型回答（必填）'),
+              system: t('export.sampleSystem', '系统提示词（选填）')
             },
             {
-              instruction: '第二个指令',
+              instruction: t('export.sampleInstruction2', '第二个指令'),
               input: '',
-              output: '第二个回答',
-              system: '系统提示词'
+              output: t('export.sampleOutput2', '第二个回答'),
+              system: t('export.sampleSystemShort', '系统提示词')
             }
           ]
         };
@@ -214,16 +214,16 @@ const LocalExportTab = ({
           headers: ['instruction', 'input', 'output', 'system'],
           rows: [
             {
-              instruction: customInstruction || '固定的指令内容',
-              input: '人类问题（必填）',
-              output: '模型回答（必填）',
-              system: '系统提示词（选填）'
+              instruction: customInstruction || t('export.fixedInstruction', '固定的指令内容'),
+              input: t('export.sampleInput', '人类问题（必填）'),
+              output: t('export.sampleOutput', '模型回答（必填）'),
+              system: t('export.sampleSystem', '系统提示词（选填）')
             },
             {
-              instruction: customInstruction || '固定的指令内容',
-              input: '第二个问题',
-              output: '第二个回答',
-              system: '系统提示词'
+              instruction: customInstruction || t('export.fixedInstruction', '固定的指令内容'),
+              input: t('export.sampleInput2', '第二个问题'),
+              output: t('export.sampleOutput2', '第二个回答'),
+              system: t('export.sampleSystemShort', '系统提示词')
             }
           ]
         };
@@ -239,15 +239,15 @@ const LocalExportTab = ({
                   messages: [
                     {
                       role: 'system',
-                      content: '系统提示词（选填）'
+                      content: t('export.sampleSystem', '系统提示词（选填）')
                     },
                     {
                       role: 'user',
-                      content: '人类指令' // 映射到 question 字段
+                      content: t('export.sampleUserMessage', '人类指令') // 映射到 question 字段
                     },
                     {
                       role: 'assistant',
-                      content: '模型回答' // 映射到 cot+answer 字段
+                      content: t('export.sampleAssistantMessage', '模型回答') // 映射到 cot+answer 字段
                     }
                   ]
                 }
@@ -265,10 +265,10 @@ const LocalExportTab = ({
           messages: JSON.stringify(
             {
               reasoning_language: 'English',
-              developer: '系统提示词（选填）',
-              user: '人类指令', // 映射到 question 字段
-              analysis: '模型的思维链内容', // 映射到 cot 字段
-              final: '模型回答', // 映射到 answer 字段
+              developer: t('export.sampleSystem', '系统提示词（选填）'),
+              user: t('export.sampleUserMessage', '人类指令'), // 映射到 question 字段
+              analysis: t('export.sampleAnalysis', '模型的思维链内容'), // 映射到 cot 字段
+              final: t('export.sampleFinal', '模型回答'), // 映射到 answer 字段
               messages: [
                 {
                   role: 'system',
@@ -380,11 +380,11 @@ const LocalExportTab = ({
       {formatType === 'alpaca' && (
         <Box sx={{ mb: 3, pl: 2, borderLeft: `1px solid ${theme.palette.divider}` }}>
           <Typography variant="subtitle2" gutterBottom>
-            {t('export.alpacaSettings') || 'Alpaca 格式设置'}
+            {t('export.alpacaSettings', 'Alpaca 格式设置')}
           </Typography>
           <FormControl component="fieldset">
             <Typography variant="body2" color="text.secondary" gutterBottom>
-              {t('export.questionFieldType') || '问题字段类型'}
+              {t('export.questionFieldType', '问题字段类型')}
             </Typography>
             <RadioGroup
               aria-label="alpacaFieldType"
@@ -396,23 +396,24 @@ const LocalExportTab = ({
               <FormControlLabel
                 value="instruction"
                 control={<Radio />}
-                label={t('export.useInstruction') || '使用 instruction 字段'}
+                label={t('export.useInstruction', '使用 instruction 字段')}
               />
-              <FormControlLabel value="input" control={<Radio />} label={t('export.useInput') || '使用 input 字段'} />
+              <FormControlLabel value="input" control={<Radio />} label={t('export.useInput', '使用 input 字段')} />
             </RadioGroup>
 
             {alpacaFieldType === 'input' && (
               <TextField
                 fullWidth
                 size="small"
-                label={t('export.customInstruction') || '自定义 instruction 字段内容'}
+                label={t('export.customInstruction', '自定义 instruction 字段内容')}
                 value={customInstruction}
                 onChange={handleCustomInstructionChange}
                 margin="normal"
-                placeholder={t('export.instructionPlaceholder') || '请输入固定的指令内容'}
-                helperText={
-                  t('export.instructionHelperText') || '当使用 input 字段时，可以在这里指定固定的 instruction 内容'
-                }
+                placeholder={t('export.instructionPlaceholder', '请输入固定的指令内容')}
+                helperText={t(
+                  'export.instructionHelperText',
+                  '当使用 input 字段时，可以在这里指定固定的 instruction 内容'
+                )}
               />
             )}
           </FormControl>
@@ -532,19 +533,19 @@ const LocalExportTab = ({
                           final: '模型回答', // 映射到 answer 字段
                           messages: [
                             {
-                              content: '系统提示词（选填）',
+                              content: t('export.sampleSystem', '系统提示词（选填）'),
                               role: 'system',
                               thinking: null
                             },
                             {
-                              content: '人类指令',
+                              content: t('export.sampleUserMessage', '人类指令'),
                               role: 'user',
                               thinking: null
                             },
                             {
-                              content: '模型回答',
+                              content: t('export.sampleAssistantMessage', '模型回答'),
                               role: 'assistant',
-                              thinking: '模型的思维链内容'
+                              thinking: t('export.sampleThinking', '模型的思维链内容')
                             }
                           ]
                         },
@@ -557,10 +558,10 @@ const LocalExportTab = ({
                       ? JSON.stringify(
                           [
                             {
-                              instruction: '人类指令（必填）', // 映射到 question 字段
-                              input: '人类输入（选填）',
-                              output: '模型回答（必填）', // 映射到 cot+answer 字段
-                              system: '系统提示词（选填）'
+                              instruction: t('export.sampleInstruction', '人类指令（必填）'), // 映射到 question 字段
+                              input: t('export.sampleInputOptional', '人类输入（选填）'),
+                              output: t('export.sampleOutput', '模型回答（必填）'), // 映射到 cot+answer 字段
+                              system: t('export.sampleSystem', '系统提示词（选填）')
                             }
                           ],
                           null,
@@ -574,15 +575,15 @@ const LocalExportTab = ({
                               messages: [
                                 {
                                   role: 'system',
-                                  content: '系统提示词（选填）'
+                                  content: t('export.sampleSystem', '系统提示词（选填）')
                                 },
                                 {
                                   role: 'user',
-                                  content: '人类指令' // 映射到 question 字段
+                                  content: t('export.sampleUserMessage', '人类指令') // 映射到 question 字段
                                 },
                                 {
                                   role: 'assistant',
-                                  content: '模型回答' // 映射到 cot+answer 字段
+                                  content: t('export.sampleAssistantMessage', '模型回答') // 映射到 cot+answer 字段
                                 }
                               ]
                             }

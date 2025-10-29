@@ -9,7 +9,7 @@ const prisma = new PrismaClient();
 export async function POST(request, { params }) {
   try {
     const { projectId } = params;
-    const { imageId, imageName, questionId, question, templateId, answerType, answer, note } = await request.json();
+    const { imageId, questionId, question, answerType, answer, note } = await request.json();
 
     // 验证必填字段
     if (!imageId || !question || !answerType || answer === undefined || answer === null) {
@@ -36,7 +36,10 @@ export async function POST(request, { params }) {
     }
 
     // 序列化答案
-    const answerString = answerType === 'text' ? answer : JSON.stringify(answer);
+    let answerString = answer;
+    if (answerType !== 'text' && typeof answerString !== 'string') {
+      answerString = JSON.stringify(answer, null, 2);
+    }
 
     // 1. 获取问题记录（前端传递的 questionId 指向已有的问题）
     if (!questionId) {

@@ -84,8 +84,6 @@ export default function AnswerInput({
       labelOptions = labels;
     }
 
-    console.log(111, labelOptions);
-
     if (!labelOptions.includes('其他') && !labelOptions.includes('other')) {
       labelOptions.push(i18n.language === 'en' ? 'other' : '其他');
     }
@@ -171,7 +169,7 @@ export default function AnswerInput({
         </Paper>
 
         {/* 添加新标签 */}
-        <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
+        {/* <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
           <TextField
             size="small"
             value={newLabel}
@@ -214,10 +212,10 @@ export default function AnswerInput({
           >
             {t('common.add', { defaultValue: '添加' })}
           </Button>
-        </Box>
+        </Box> */}
 
         {/* 已选择标签 */}
-        {selectedLabels.length > 0 && (
+        {/* {selectedLabels.length > 0 && (
           <Box>
             <Typography variant="subtitle2" color="text.secondary" gutterBottom sx={{ fontWeight: 600, mb: 2 }}>
               {t('images.selectedLabels', { defaultValue: '已选择' })} ({selectedLabels.length})
@@ -255,7 +253,7 @@ export default function AnswerInput({
               </Box>
             </Paper>
           </Box>
-        )}
+        )} */}
       </Box>
     );
   }
@@ -274,17 +272,6 @@ export default function AnswerInput({
         }
       } else {
         setJsonError('');
-      }
-    };
-
-    const handleFormatJson = () => {
-      try {
-        const parsed = typeof answer === 'string' ? answer : JSON.parse(answer);
-        const formatted = JSON.stringify(parsed, null, 2);
-        onAnswerChange(formatted);
-        setJsonError('');
-      } catch (e) {
-        setJsonError(t('images.invalidJsonFormat', { defaultValue: 'JSON 格式不正确' }));
       }
     };
 
@@ -341,7 +328,7 @@ export default function AnswerInput({
                 {t('images.useTemplate', { defaultValue: '使用模板' })}
               </Button>
             )}
-            <Button
+            {/* <Button
               size="small"
               onClick={handleFormatJson}
               variant="outlined"
@@ -357,7 +344,7 @@ export default function AnswerInput({
               }}
             >
               {t('images.formatJson', { defaultValue: '格式化' })}
-            </Button>
+            </Button> */}
           </Box>
         </Box>
 
@@ -412,7 +399,6 @@ export default function AnswerInput({
           onChange={e => handleJsonChange(e.target.value)}
           placeholder={t('images.customFormatPlaceholder', { defaultValue: '请输入符合格式的 JSON...' })}
           error={!!jsonError}
-          helperText={jsonError || t('images.jsonFormatHelp', { defaultValue: '请输入有效的JSON格式数据' })}
           sx={{
             '& .MuiOutlinedInput-root': {
               borderRadius: 3,

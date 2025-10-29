@@ -248,9 +248,6 @@ export default function ImagesPage() {
           <Typography variant="h4" component="h1" sx={imageStyles.title}>
             {t('images.title', { defaultValue: '图片管理' })}
           </Typography>
-          <Typography variant="body2" sx={imageStyles.subtitle}>
-            {t('images.subtitle', { defaultValue: '管理项目中的图片资源，生成问题和数据集' })}
-          </Typography>
         </Box>
         <Box sx={imageStyles.headerActions}>
           <Button

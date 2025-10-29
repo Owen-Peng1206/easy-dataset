@@ -257,7 +257,9 @@ export default function Navbar({ projects = [], currentProject }) {
               value={
                 pathname.includes('/settings') || pathname.includes('/playground') || pathname.includes('/datasets-sq')
                   ? 'more'
-                  : pathname.includes('/datasets') || pathname.includes('/multi-turn')
+                  : pathname.includes('/datasets') ||
+                      pathname.includes('/multi-turn') ||
+                      pathname.includes('/image-datasets')
                     ? 'datasets'
                     : pathname.includes('/text-split') || pathname.includes('/images')
                       ? 'source'
@@ -431,6 +433,18 @@ export default function Navbar({ projects = [], currentProject }) {
               <ChatIcon fontSize="small" />
             </ListItemIcon>
             <ListItemText primary={t('datasets.multiTurn', '多轮对话数据集')} />
+          </MenuItem>
+          <Divider />
+          <MenuItem
+            component={Link}
+            href={`/projects/${selectedProject}/image-datasets`}
+            onClick={handleDatasetMenuClose}
+            selected={pathname === `/projects/${selectedProject}/image-datasets`}
+          >
+            <ListItemIcon>
+              <ImageIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText primary={t('datasets.imageQA', '图片问答数据集')} />
           </MenuItem>
         </Menu>
 

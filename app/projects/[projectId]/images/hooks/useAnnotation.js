@@ -160,6 +160,7 @@ export function useAnnotation(projectId, onSuccess, onFindNextImage) {
       }
     }
 
+    console.log(999, answer);
     setSaving(true);
     try {
       const response = await axios.post(`/api/projects/${projectId}/images/annotations`, {

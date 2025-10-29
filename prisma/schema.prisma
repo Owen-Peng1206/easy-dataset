@@ -9,32 +9,32 @@ datasource db {
 }
 
 model Projects {
-  id                     String                   @id @default(nanoid(12))
-  name                   String
-  description            String
-  globalPrompt           String                   @default("")
-  questionPrompt         String                   @default("")
-  answerPrompt           String                   @default("")
-  labelPrompt            String                   @default("")
-  domainTreePrompt       String                   @default("")
-  cleanPrompt            String                   @default("")
-  defaultModelConfigId   String?
-  test                   String                   @default("")
-  createAt               DateTime                 @default(now())
-  updateAt               DateTime                 @updatedAt
-  Questions              Questions[]
-  Datasets               Datasets[]
-  DatasetConversations   DatasetConversations[]
-  Chunks                 Chunks[]
-  ModelConfig            ModelConfig[]
-  UploadFiles            UploadFiles[]
-  Tags                   Tags[]
-  Task                   Task[]
-  GaPairs                GaPairs[]
-  CustomPrompts          CustomPrompts[]
-  Images                 Images[]
-  ImageDatasets          ImageDatasets[]
-  QuestionTemplates      QuestionTemplates[]
+  id                   String                 @id @default(nanoid(12))
+  name                 String
+  description          String
+  globalPrompt         String                 @default("")
+  questionPrompt       String                 @default("")
+  answerPrompt         String                 @default("")
+  labelPrompt          String                 @default("")
+  domainTreePrompt     String                 @default("")
+  cleanPrompt          String                 @default("")
+  defaultModelConfigId String?
+  test                 String                 @default("")
+  createAt             DateTime               @default(now())
+  updateAt             DateTime               @updatedAt
+  Questions            Questions[]
+  Datasets             Datasets[]
+  DatasetConversations DatasetConversations[]
+  Chunks               Chunks[]
+  ModelConfig          ModelConfig[]
+  UploadFiles          UploadFiles[]
+  Tags                 Tags[]
+  Task                 Task[]
+  GaPairs              GaPairs[]
+  CustomPrompts        CustomPrompts[]
+  Images               Images[]
+  ImageDatasets        ImageDatasets[]
+  QuestionTemplates    QuestionTemplates[]
 }
 
 model UploadFiles {
@@ -107,6 +107,7 @@ model Datasets {
   questionId    String
   question      String
   answer        String
+  answerType    String?  @default("text") // 'text' | 'label' | 'custom_format'
   chunkName     String
   chunkContent  String
   model         String
