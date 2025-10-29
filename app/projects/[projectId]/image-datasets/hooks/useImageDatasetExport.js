@@ -13,7 +13,7 @@ const useImageDatasetExport = projectId => {
    */
   const parseAnswerLabels = item => {
     const { answer, answerType } = item;
-    if (answerType !== 'labels' || !answer) {
+    if (answerType !== 'label' || !answer) {
       return answer;
     }
 

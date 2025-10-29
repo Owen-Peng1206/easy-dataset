@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getProjectPath } from '@/lib/db/base';
+import { importImagesFromDirectories } from '@/lib/services/images';
 import fs from 'fs/promises';
 import path from 'path';
 import { savePdfAsImages } from '@/lib/util/file';
@@ -44,23 +45,8 @@ export async function POST(request, { params }) {
       throw new Error('PDF 转换失败，未生成图片');
     }
 
-    // 4. 调用现有的图片导入逻辑（复用 POST /api/projects/[projectId]/images）
-    const importResponse = await fetch(`${request.nextUrl.origin}/api/projects/${projectId}/images`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        directories: [tempImagesDir]
-      })
-    });
-
-    if (!importResponse.ok) {
-      const error = await importResponse.json();
-      throw new Error(error.error || '导入图片失败');
-    }
-
-    const importResult = await importResponse.json();
+    // 4. 直接调用服务层导入图片
+    const importResult = await importImagesFromDirectories(projectId, [tempImagesDir]);
 
     // 5. 清理临时文件
     try {

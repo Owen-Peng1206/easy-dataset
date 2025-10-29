@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
+import { getImageDetailWithQuestions } from '@/lib/services/images';
 
 const prisma = new PrismaClient();
 
@@ -26,15 +27,12 @@ export async function GET(request, { params }) {
       });
     }
 
-    // 获取该图片的完整详情
-    const imageResponse = await fetch(
-      `${request.nextUrl.origin}/api/projects/${projectId}/images/${unansweredQuestion.imageId}`
-    );
-    const imageData = await imageResponse.json();
+    // 调用服务层获取图片详情
+    const imageData = await getImageDetailWithQuestions(projectId, unansweredQuestion.imageId);
 
     return NextResponse.json({
       success: true,
-      data: imageData.data
+      data: imageData
     });
   } catch (error) {
     console.error('Failed to get next unanswered image:', error);

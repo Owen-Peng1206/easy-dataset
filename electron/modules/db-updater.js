@@ -43,7 +43,7 @@ async function executeSql(dbUrl, sql) {
  * @param {boolean} isDev 是否开发环境
  * @returns {Promise<{userSqlConfig: Array, appSqlConfig: Array}>}
  */
-async function getSqlConfigs(userDataPath, resourcesPath, isDev) {
+async function getSqlConfigs(userDataPath, resourcesPath, isDev, logger = console.log) {
   // 用户SQL配置文件路径
   const userSqlPath = path.join(userDataPath, 'sql.json');
 
@@ -75,6 +75,11 @@ async function getSqlConfigs(userDataPath, resourcesPath, isDev) {
     // 如果用户SQL配置不存在或无法解析，使用空数组
     userSqlConfig = [];
   }
+
+  logger(appSqlPath);
+  // logger(JSON.stringify(appSqlConfig, null, 2));
+  logger(userSqlPath);
+  // logger(JSON.stringify(userSqlConfig, null, 2));
 
   return { userSqlConfig, appSqlConfig };
 }
@@ -124,7 +129,7 @@ async function updateDatabase(userDataPath, resourcesPath, isDev, logger = conso
 
   try {
     // 获取SQL配置
-    const { userSqlConfig, appSqlConfig } = await getSqlConfigs(userDataPath, resourcesPath, isDev);
+    const { userSqlConfig, appSqlConfig } = await getSqlConfigs(userDataPath, resourcesPath, isDev, logger);
 
     // 获取需要执行的SQL
     const sqlsToExecute = getSqlsToExecute(userSqlConfig, appSqlConfig);

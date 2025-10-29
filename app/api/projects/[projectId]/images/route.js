@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server';
-import { getImages, createImages, deleteImage, getImageDetail } from '@/lib/db/images';
+import { getImages, deleteImage, getImageDetail } from '@/lib/db/images';
 import { getProjectPath } from '@/lib/db/base';
+import { db } from '@/lib/db/index';
+import { importImagesFromDirectories } from '@/lib/services/images';
 import fs from 'fs/promises';
 import path from 'path';
-import sizeOf from 'image-size';
 
 // 获取图片列表
 export async function GET(request, { params }) {
@@ -33,70 +34,10 @@ export async function POST(request, { params }) {
     const { projectId } = params;
     const { directories } = await request.json();
 
-    if (!directories || !Array.isArray(directories) || directories.length === 0) {
-      return NextResponse.json({ error: '请选择至少一个目录' }, { status: 400 });
-    }
+    // 调用服务层处理图片导入
+    const result = await importImagesFromDirectories(projectId, directories);
 
-    // 项目图片目录
-    const projectPath = await getProjectPath(projectId);
-    const projectImagesDir = path.join(projectPath, 'images');
-    await fs.mkdir(projectImagesDir, { recursive: true });
-
-    const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp', '.svg'];
-    const importedImages = [];
-
-    // 遍历所有选择的目录
-    for (const directory of directories) {
-      try {
-        const files = await fs.readdir(directory);
-
-        for (const file of files) {
-          const ext = path.extname(file).toLowerCase();
-          if (!imageExtensions.includes(ext)) continue;
-
-          const sourcePath = path.join(directory, file);
-          const destPath = path.join(projectImagesDir, file);
-
-          // 复制文件（覆盖同名文件）
-          await fs.copyFile(sourcePath, destPath);
-
-          // 获取图片信息
-          const stats = await fs.stat(destPath);
-          let dimensions = { width: null, height: null };
-
-          try {
-            // 读取文件为 Buffer，然后传递给 sizeOf
-            const imageBuffer = await fs.readFile(destPath);
-            const size = sizeOf(imageBuffer);
-            if (size && size.width && size.height) {
-              dimensions = { width: size.width, height: size.height };
-            }
-          } catch (err) {
-            console.warn(`无法获取图片尺寸: ${file}`, err.message);
-          }
-
-          const projectPath = await getProjectPath(projectId);
-          importedImages.push({
-            imageName: file,
-            path: `${projectPath}/images/${file}`,
-            size: stats.size,
-            width: dimensions.width,
-            height: dimensions.height
-          });
-        }
-      } catch (err) {
-        console.error(`处理目录失败: ${directory}`, err);
-      }
-    }
-
-    // 批量保存到数据库
-    const savedImages = await createImages(projectId, importedImages);
-
-    return NextResponse.json({
-      success: true,
-      count: savedImages.length,
-      images: savedImages
-    });
+    return NextResponse.json(result);
   } catch (error) {
     console.error('Failed to import images:', error);
     return NextResponse.json({ error: error.message || 'Failed to import images' }, { status: 500 });
@@ -120,6 +61,16 @@ export async function DELETE(request, { params }) {
     if (!image) {
       return NextResponse.json({ error: '图片不存在' }, { status: 404 });
     }
+
+    // 删除关联的数据集
+    await db.imageDatasets.deleteMany({
+      where: { imageId }
+    });
+
+    // 删除关联的问题
+    await db.questions.deleteMany({
+      where: { imageId }
+    });
 
     // 删除文件
     const projectPath = await getProjectPath(projectId);
