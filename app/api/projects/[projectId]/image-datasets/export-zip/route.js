@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getImageDatasetsForExport } from '@/lib/db/imageDatasets';
 import archiver from 'archiver';
+import { getProjectPath } from '@/lib/db/base';
 import path from 'path';
 import fs from 'fs';
 
@@ -42,7 +43,8 @@ export async function GET(request, { params }) {
     const filename = `images-${projectId}-${dateStr}.zip`;
 
     // 添加图片文件到压缩包
-    const imageDir = path.join(process.cwd(), 'local-db', projectId, 'images');
+    const projectPath = await getProjectPath(projectId);
+    const imageDir = path.join(projectPath, 'images');
 
     if (!fs.existsSync(imageDir)) {
       return NextResponse.json({ error: 'Image directory not found' }, { status: 404 });

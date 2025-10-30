@@ -167,6 +167,7 @@ const useImageDatasetExport = projectId => {
           const a = document.createElement('a');
           a.href = zipUrl;
           a.style.display = 'none';
+          a.target = '_blank';
           document.body.appendChild(a);
           a.click();
           document.body.removeChild(a);
