@@ -1,7 +1,7 @@
 // 默认项目任务配置
 export const DEFAULT_SETTINGS = {
-  textSplitMinLength: 1500,
-  textSplitMaxLength: 2000,
+  textSplitMinLength: 2500,
+  textSplitMaxLength: 4000,
   questionGenerationLength: 240,
   questionMaskRemovingProbability: 60,
   huggingfaceToken: '',

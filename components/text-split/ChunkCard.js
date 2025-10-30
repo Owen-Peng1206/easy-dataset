@@ -16,7 +16,8 @@ import {
   DialogContent,
   DialogActions,
   Button,
-  TextField
+  TextField,
+  CircularProgress
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import VisibilityIcon from '@mui/icons-material/Visibility';
@@ -83,6 +84,7 @@ export default function ChunkCard({
   const { t } = useTranslation();
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [chunkForEdit, setChunkForEdit] = useState(null);
+  const [generatingQuestions, setGeneratingQuestions] = useState(false);
 
   // 获取文本预览
   const getTextPreview = (content, maxLength = 150) => {
@@ -126,6 +128,25 @@ export default function ChunkCard({
       onEdit(chunk.id, newContent);
     }
   };
+
+  // 处理生成单个问题 - 后台执行，不阻塞UI
+  const handleGenerateQuestionsClick = () => {
+    setGeneratingQuestions(true);
+    // 不等待 onGenerateQuestions 完成，直接返回
+    // onGenerateQuestions 会在后台处理，完成后会调用 fetchChunks 刷新列表
+    onGenerateQuestions([chunk.id]);
+  };
+
+  // 监听 chunk 数据变化，当问题生成完成时关闭 Loading
+  useEffect(() => {
+    if (generatingQuestions && chunk.Questions && chunk.Questions.length > 0) {
+      // 延迟一下再关闭，让用户看到完成的状态
+      const timer = setTimeout(() => {
+        setGeneratingQuestions(false);
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [chunk.Questions, generatingQuestions]);
 
   return (
     <>
@@ -283,8 +304,8 @@ export default function ChunkCard({
               <IconButton
                 size="small"
                 color="info"
-                onClick={onGenerateQuestions}
-                disabled={!selectedModel?.id}
+                onClick={handleGenerateQuestionsClick}
+                disabled={!selectedModel?.id || generatingQuestions}
                 sx={{
                   bgcolor: theme.palette.mode === 'dark' ? 'rgba(41, 182, 246, 0.08)' : 'rgba(2, 136, 209, 0.08)',
                   '&.Mui-disabled': {
@@ -293,7 +314,7 @@ export default function ChunkCard({
                   }
                 }}
               >
-                <QuizIcon fontSize="small" />
+                {generatingQuestions ? <CircularProgress size={20} color="inherit" /> : <QuizIcon fontSize="small" />}
               </IconButton>
             </span>
           </Tooltip>

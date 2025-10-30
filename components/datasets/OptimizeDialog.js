@@ -1,26 +1,25 @@
 'use client';
 
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, CircularProgress } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField } from '@mui/material';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 /**
  * AI优化对话框组件
  */
-export default function OptimizeDialog({ open, onClose, onConfirm, loading }) {
+export default function OptimizeDialog({ open, onClose, onConfirm }) {
   const [advice, setAdvice] = useState('');
   const { t } = useTranslation();
 
   const handleConfirm = () => {
     onConfirm(advice);
     setAdvice('');
+    onClose();
   };
 
   const handleClose = () => {
-    if (!loading) {
-      onClose();
-      setAdvice('');
-    }
+    onClose();
+    setAdvice('');
   };
 
   return (
@@ -37,16 +36,13 @@ export default function OptimizeDialog({ open, onClose, onConfirm, loading }) {
           rows={4}
           value={advice}
           onChange={e => setAdvice(e.target.value)}
-          disabled={loading}
           placeholder={t('datasets.optimizePlaceholder')}
         />
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose} disabled={loading}>
-          {t('common.cancel')}
-        </Button>
-        <Button onClick={handleConfirm} variant="contained" color="primary" disabled={loading || !advice.trim()}>
-          {loading ? <CircularProgress size={24} /> : t('common.confirm')}
+        <Button onClick={handleClose}>{t('common.cancel')}</Button>
+        <Button onClick={handleConfirm} variant="contained" color="primary" disabled={!advice.trim()}>
+          {t('common.confirm')}
         </Button>
       </DialogActions>
     </Dialog>

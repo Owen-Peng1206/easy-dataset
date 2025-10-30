@@ -18,11 +18,24 @@ export default function QuestionsFilter({
 
   // 过滤相关
   answerFilter,
-  onFilterChange
+  onFilterChange,
+
+  // 文本块名称筛选
+  chunkNameFilter,
+  onChunkNameFilterChange,
+
+  // 数据源类型筛选
+  sourceTypeFilter,
+  onSourceTypeFilterChange,
+
+  activeTab
 }) {
   const { t } = useTranslation();
   const theme = useTheme();
 
+  if (activeTab === 1) {
+    return <></>;
+  }
   return (
     <Box sx={{ p: 2 }}>
       <Stack
@@ -47,7 +60,7 @@ export default function QuestionsFilter({
         </Box>
 
         {/* 搜索和过滤区域 */}
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
           <TextField
             placeholder={t('questions.searchPlaceholder')}
             variant="outlined"
@@ -64,12 +77,56 @@ export default function QuestionsFilter({
               )
             }}
           />
+          <TextField
+            placeholder={t('questions.filterChunkNamePlaceholder')}
+            variant="outlined"
+            size="small"
+            sx={{ width: { xs: '100%', sm: 200 } }}
+            value={chunkNameFilter}
+            onChange={onChunkNameFilterChange}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon fontSize="small" color="action" />
+                </InputAdornment>
+              )
+            }}
+          />
+          <Select
+            value={sourceTypeFilter}
+            onChange={onSourceTypeFilterChange}
+            size="small"
+            sx={{
+              width: { xs: '100%', sm: 150 },
+              bgcolor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'white',
+              borderRadius: '8px',
+              '& .MuiOutlinedInput-notchedOutline': {
+                borderColor: theme.palette.mode === 'dark' ? 'transparent' : 'rgba(0, 0, 0, 0.23)'
+              },
+              '&:hover .MuiOutlinedInput-notchedOutline': {
+                borderColor: theme.palette.mode === 'dark' ? 'transparent' : 'rgba(0, 0, 0, 0.87)'
+              },
+              '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                borderColor: 'primary.main'
+              }
+            }}
+            MenuProps={{
+              PaperProps: {
+                elevation: 2,
+                sx: { mt: 1, borderRadius: 2 }
+              }
+            }}
+          >
+            <MenuItem value="all">{t('questions.sourceTypeAll')}</MenuItem>
+            <MenuItem value="text">{t('questions.sourceTypeText')}</MenuItem>
+            <MenuItem value="image">{t('questions.sourceTypeImage')}</MenuItem>
+          </Select>
           <Select
             value={answerFilter}
             onChange={onFilterChange}
             size="small"
             sx={{
-              width: { xs: '100%', sm: 200 },
+              width: { xs: '100%', sm: 150 },
               bgcolor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'white',
               borderRadius: '8px',
               '& .MuiOutlinedInput-notchedOutline': {

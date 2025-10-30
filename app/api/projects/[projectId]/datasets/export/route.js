@@ -22,30 +22,52 @@ export async function GET(request, { params }) {
       return NextResponse.json({ error: 'Project ID cannot be empty' }, { status: 400 });
     }
 
-    let status = searchParams.get('status');
+    const confirmedParam = searchParams.get('confirmed');
+    const confirmed = confirmedParam === null ? undefined : confirmedParam === 'true';
+
+    // 获取标签统计信息
+    const tagStats = await getTagsWithDatasetCounts(projectId, confirmed);
+    return NextResponse.json(tagStats);
+  } catch (error) {
+    console.error('Failed to get tag statistics:', String(error));
+    return NextResponse.json(
+      {
+        error: error.message || 'Failed to get tag statistics'
+      },
+      { status: 500 }
+    );
+  }
+}
+
+/**
+ * 获取标签统计信息
+ */
+export async function POST(request, { params }) {
+  try {
+    const { projectId } = params;
+    const body = await request.json();
+
+    // 验证项目ID
+    if (!projectId) {
+      return NextResponse.json({ error: 'Project ID cannot be empty' }, { status: 400 });
+    }
+
+    let status = body.status;
     let confirmed = undefined;
     if (status === 'confirmed') confirmed = true;
     if (status === 'unconfirmed') confirmed = false;
 
     // 检查是否是分批导出模式
-    const batchMode = searchParams.get('batchMode');
-    const offset = parseInt(searchParams.get('offset')) || 0;
-    const batchSize = parseInt(searchParams.get('batchSize')) || 1000;
+    const batchMode = body.batchMode ? 'true' : 'false';
+    const offset = body.offset ?? 0;
+    const batchSize = body.batchSize ?? 1000;
 
     // 检查是否是平衡导出
-    const balanceMode = searchParams.get('balanceMode');
-    const balanceConfig = searchParams.get('balanceConfig');
+    const balanceMode = body.balanceMode ? 'true' : 'false';
+    const balanceConfig = body.balanceConfig;
 
     // 检查是否有选中的数据集 ID
-    const selectedIdsParam = searchParams.get('selectedIds');
-    let selectedIds = null;
-    if (selectedIdsParam) {
-      try {
-        selectedIds = JSON.parse(selectedIdsParam);
-      } catch (e) {
-        console.error('Failed to parse selectedIds:', e);
-      }
-    }
+    const selectedIds = Array.isArray(body.selectedIds) ? body.selectedIds : null;
 
     if (batchMode === 'true') {
       // 分批导出模式
@@ -60,7 +82,7 @@ export async function GET(request, { params }) {
         });
       } else if (balanceMode === 'true' && balanceConfig) {
         // 平衡分批导出
-        const parsedConfig = JSON.parse(balanceConfig);
+        const parsedConfig = typeof balanceConfig === 'string' ? JSON.parse(balanceConfig) : balanceConfig;
         const result = await getBalancedDatasetsByTagsBatch(projectId, parsedConfig, confirmed, offset, batchSize);
         return NextResponse.json({
           data: result.data,
@@ -78,14 +100,14 @@ export async function GET(request, { params }) {
         });
       }
     } else {
-      // 传统一次性导出模式（保持向后兄容）
+      // 传统一次性导出模式（保持向后兼容）
       if (selectedIds && selectedIds.length > 0) {
         // 按选中 ID 导出
         const datasets = await getDatasetsByIds(projectId, selectedIds);
         return NextResponse.json(datasets);
       } else if (balanceMode === 'true' && balanceConfig) {
         // 平衡导出模式
-        const parsedConfig = JSON.parse(balanceConfig);
+        const parsedConfig = typeof balanceConfig === 'string' ? JSON.parse(balanceConfig) : balanceConfig;
         const datasets = await getBalancedDatasetsByTags(projectId, parsedConfig, confirmed);
         return NextResponse.json(datasets);
       } else {
@@ -99,34 +121,6 @@ export async function GET(request, { params }) {
     return NextResponse.json(
       {
         error: error.message || 'Failed to get datasets'
-      },
-      { status: 500 }
-    );
-  }
-}
-
-/**
- * 获取标签统计信息
- */
-export async function POST(request, { params }) {
-  try {
-    const { projectId } = params;
-    const body = await request.json();
-    const { confirmed } = body;
-
-    // 验证项目ID
-    if (!projectId) {
-      return NextResponse.json({ error: 'Project ID cannot be empty' }, { status: 400 });
-    }
-
-    // 获取标签统计信息
-    const tagStats = await getTagsWithDatasetCounts(projectId, confirmed);
-    return NextResponse.json(tagStats);
-  } catch (error) {
-    console.error('Failed to get tag statistics:', String(error));
-    return NextResponse.json(
-      {
-        error: error.message || 'Failed to get tag statistics'
       },
       { status: 500 }
     );

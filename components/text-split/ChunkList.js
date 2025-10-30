@@ -46,6 +46,51 @@ export default function ChunkList({
   const [batchEditDialogOpen, setBatchEditDialogOpen] = useState(false);
   const [batchEditLoading, setBatchEditLoading] = useState(false);
 
+  // 添加高级筛选状态
+  const [advancedFilters, setAdvancedFilters] = useState({
+    contentKeyword: '',
+    sizeRange: [0, 10000],
+    hasQuestions: null
+  });
+
+  // 计算活跃筛选条件数
+  const getActiveFilterCount = () => {
+    let count = 0;
+    if (advancedFilters.contentKeyword) count++;
+    if (advancedFilters.sizeRange[0] > 0 || advancedFilters.sizeRange[1] < 10000) count++;
+    if (advancedFilters.hasQuestions !== null) count++;
+    return count;
+  };
+
+  // 应用所有筛选条件
+  const applyFilters = chunkList => {
+    return chunkList.filter(chunk => {
+      // 内容关键词筛选
+      if (advancedFilters.contentKeyword) {
+        const keyword = advancedFilters.contentKeyword.toLowerCase();
+        if (!chunk.content?.toLowerCase().includes(keyword)) {
+          return false;
+        }
+      }
+
+      // 字数范围筛选
+      const size = chunk.size || 0;
+      if (size < advancedFilters.sizeRange[0] || size > advancedFilters.sizeRange[1]) {
+        return false;
+      }
+
+      // 问题状态筛选（如果设置了）
+      if (advancedFilters.hasQuestions !== null) {
+        const hasQuestions = chunk.Questions && chunk.Questions.length > 0;
+        if (advancedFilters.hasQuestions !== hasQuestions) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+  };
+
   // 对文本块进行排序，先按文件ID排序，再按part-后面的数字排序
   const sortedChunks = [...chunks].sort((a, b) => {
     // 先按fileId排序
@@ -65,11 +110,14 @@ export default function ChunkList({
     return numA - numB;
   });
 
+  // 应用高级筛选
+  const filteredChunks = applyFilters(sortedChunks);
+
   const itemsPerPage = 5;
   const startIndex = (page - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const displayedChunks = sortedChunks.slice(startIndex, endIndex);
-  const totalPages = Math.ceil(sortedChunks.length / itemsPerPage);
+  const displayedChunks = filteredChunks.slice(startIndex, endIndex);
+  const totalPages = Math.ceil(filteredChunks.length / itemsPerPage);
   const { t } = useTranslation();
 
   const handlePageChange = (event, value) => {
@@ -211,11 +259,17 @@ export default function ChunkList({
     );
   }
 
+  // 处理筛选变化
+  const handleFilterChange = filters => {
+    setAdvancedFilters(filters);
+    setPage(1); // 重置到第一页
+  };
+
   return (
     <Box>
       <ChunkListHeader
         projectId={projectId}
-        totalChunks={chunks.length}
+        totalChunks={filteredChunks.length}
         selectedChunks={selectedChunks}
         onSelectAll={handleSelectAll}
         onBatchGenerateQuestions={handleBatchGenerateQuestions}
@@ -224,6 +278,8 @@ export default function ChunkList({
         setQuestionFilter={event => setQuestionFilter(event.target.value)}
         chunks={chunks}
         selectedModel={selectedModel}
+        onFilterChange={handleFilterChange}
+        activeFilterCount={getActiveFilterCount()}
       />
 
       <Grid container spacing={2}>

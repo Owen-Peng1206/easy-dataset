@@ -16,6 +16,7 @@ import AutoDistillProgress from '@/components/distill/AutoDistillProgress';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import { autoDistillService } from './autoDistillService';
 import axios from 'axios';
+import { toast } from 'sonner';
 
 export default function DistillPage() {
   const { t, i18n } = useTranslation();
@@ -198,7 +199,7 @@ export default function DistillPage() {
     setAutoDistillDialogOpen(true);
   };
 
-  // 开始自动蒸馏任务
+  // 开始自动蒸馏任务（前台运行）
   const handleStartAutoDistill = async config => {
     setAutoDistillDialogOpen(false);
     setAutoDistillProgressOpen(true);
@@ -246,8 +247,52 @@ export default function DistillPage() {
       setAutoDistillRunning(false);
     } catch (error) {
       console.error('自动蒸馏任务执行失败:', error);
-      addLog(`任务执行出错: ${error.message || '未知错误'}`);
+      addLog(t('distill.taskExecutionError', { error: error.message || t('common.unknownError') }));
       setAutoDistillRunning(false);
+    }
+  };
+
+  // 开始自动蒸馏任务（后台运行）
+  const handleStartAutoDistillBackground = async config => {
+    setAutoDistillDialogOpen(false);
+
+    try {
+      // 检查模型是否存在
+      if (!selectedModel || Object.keys(selectedModel).length === 0) {
+        setError(t('distill.selectModelFirst'));
+        return;
+      }
+
+      // 创建后台任务
+      const response = await axios.post(`/api/projects/${projectId}/tasks`, {
+        taskType: 'data-distillation',
+        modelInfo: selectedModel,
+        language: i18n.language,
+        detail: t('distill.autoDistillTaskDetail', { topic: config.topic }),
+        totalCount: config.estimatedQuestions,
+        note: {
+          topic: config.topic,
+          levels: config.levels,
+          tagsPerLevel: config.tagsPerLevel,
+          questionsPerTag: config.questionsPerTag,
+          datasetType: config.datasetType,
+          estimatedTags: config.estimatedTags,
+          estimatedQuestions: config.estimatedQuestions
+        }
+      });
+
+      if (response.data.code === 0) {
+        toast.success(t('distill.backgroundTaskCreated'));
+        // 3秒后刷新统计信息
+        setTimeout(() => {
+          fetchDistillStats();
+        }, 3000);
+      } else {
+        toast.error(response.data.message || t('distill.backgroundTaskFailed'));
+      }
+    } catch (error) {
+      console.error('创建后台蒸馏任务失败:', error);
+      toast.error(error.message || t('distill.backgroundTaskFailed'));
     }
   };
 
@@ -429,6 +474,7 @@ export default function DistillPage() {
               tags={tags}
               onGenerateSubTags={handleOpenTagDialog}
               onGenerateQuestions={handleOpenQuestionDialog}
+              onTagsUpdate={setTags}
             />
           </Box>
         )}
@@ -465,6 +511,7 @@ export default function DistillPage() {
         open={autoDistillDialogOpen}
         onClose={() => setAutoDistillDialogOpen(false)}
         onStart={handleStartAutoDistill}
+        onStartBackground={handleStartAutoDistillBackground}
         projectId={projectId}
         project={project}
         stats={distillStats}

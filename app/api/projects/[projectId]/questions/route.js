@@ -3,10 +3,10 @@ import {
   getAllQuestionsByProjectId,
   getQuestions,
   getQuestionsIds,
-  isExistByQuestion,
   saveQuestions,
   updateQuestion
 } from '@/lib/db/questions';
+import { getImageById, getImageChunk } from '@/lib/db/images';
 
 // 获取项目的所有问题
 export async function GET(request, { params }) {
@@ -21,9 +21,11 @@ export async function GET(request, { params }) {
     let answered = undefined;
     if (status === 'answered') answered = true;
     if (status === 'unanswered') answered = false;
+    const chunkName = searchParams.get('chunkName');
+    const sourceType = searchParams.get('sourceType') || 'all'; // 'all', 'text', 'image'
     let selectedAll = searchParams.get('selectedAll');
     if (selectedAll) {
-      let data = await getQuestionsIds(projectId, answered, searchParams.get('input'));
+      let data = await getQuestionsIds(projectId, answered, searchParams.get('input'), chunkName, sourceType);
       return NextResponse.json(data);
     }
     let all = searchParams.get('all');
@@ -37,7 +39,9 @@ export async function GET(request, { params }) {
       parseInt(searchParams.get('page')),
       parseInt(searchParams.get('size')),
       answered,
-      searchParams.get('input')
+      searchParams.get('input'),
+      chunkName,
+      sourceType
     );
 
     return NextResponse.json(questions);
@@ -55,24 +59,18 @@ export async function POST(request, { params }) {
     const { question, chunkId, label } = body;
 
     // 验证必要参数
-    if (!projectId || !question || !chunkId) {
+    if (!projectId || !question) {
       return NextResponse.json({ error: 'Missing necessary parameters' }, { status: 400 });
     }
 
-    // 检查问题是否已存在（仅在当前项目中检查）
-    const existingQuestion = await isExistByQuestion(question, projectId);
-    if (existingQuestion) {
-      return NextResponse.json({ error: 'Question already exists' }, { status: 400 });
+    if (!body.chunkId && body.imageId) {
+      const chunk = await getImageChunk(projectId);
+      body.chunkId = chunk.id;
+      body.label = 'image';
     }
 
     // 添加新问题
-    let questions = [
-      {
-        chunkId: chunkId,
-        question: question,
-        label: label || 'other'
-      }
-    ];
+    let questions = [body];
     // 保存更新后的数据
     let data = await saveQuestions(projectId, questions);
 
@@ -89,6 +87,10 @@ export async function PUT(request) {
   try {
     const body = await request.json();
     // 保存更新后的数据
+    const { imageId } = body;
+    if (imageId) {
+      body.imageName = (await getImageById(imageId))?.imageName;
+    }
     let data = await updateQuestion(body);
     // 返回更新后的问题数据
     return NextResponse.json(data);

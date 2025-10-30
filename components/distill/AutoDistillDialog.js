@@ -27,11 +27,20 @@ import {
  * @param {boolean} props.open - 对话框是否打开
  * @param {Function} props.onClose - 关闭对话框的回调
  * @param {Function} props.onStart - 开始蒸馏任务的回调
+ * @param {Function} props.onStartBackground - 开始后台蒸馏任务的回调
  * @param {string} props.projectId - 项目ID
  * @param {Object} props.project - 项目信息
  * @param {Object} props.stats - 当前统计信息
  */
-export default function AutoDistillDialog({ open, onClose, onStart, projectId, project, stats = {} }) {
+export default function AutoDistillDialog({
+  open,
+  onClose,
+  onStart,
+  onStartBackground,
+  projectId,
+  project,
+  stats = {}
+}) {
   const { t } = useTranslation();
 
   // 表单状态
@@ -102,6 +111,21 @@ export default function AutoDistillDialog({ open, onClose, onStart, projectId, p
     if (error) return;
 
     onStart({
+      topic,
+      levels,
+      tagsPerLevel,
+      questionsPerTag,
+      estimatedTags,
+      estimatedQuestions,
+      datasetType
+    });
+  };
+
+  // 处理开始后台任务
+  const handleStartBackground = () => {
+    if (error) return;
+
+    onStartBackground({
       topic,
       levels,
       tagsPerLevel,
@@ -289,6 +313,9 @@ export default function AutoDistillDialog({ open, onClose, onStart, projectId, p
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>{t('common.cancel')}</Button>
+        <Button onClick={handleStartBackground} color="secondary" variant="outlined" disabled={!!error || !topic}>
+          {t('distill.startAutoDistillBackground', { defaultValue: '开始自动蒸馏（后台运行）' })}
+        </Button>
         <Button onClick={handleStart} color="primary" variant="contained" disabled={!!error || !topic}>
           {t('distill.startAutoDistill')}
         </Button>

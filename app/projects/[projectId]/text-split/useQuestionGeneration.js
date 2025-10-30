@@ -47,7 +47,9 @@ export default function useQuestionGeneration(projectId, taskSettings) {
   const handleGenerateQuestions = useCallback(
     async (chunkIds, selectedModelInfo, fetchChunks) => {
       try {
-        setProcessing(true);
+        if (chunkIds.length > 1) {
+          setProcessing(true);
+        }
         // 重置进度状态
         setProgress({
           total: chunkIds.length,

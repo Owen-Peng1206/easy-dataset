@@ -12,6 +12,7 @@ import { toast } from 'sonner';
 // 导入子组件
 import TagTreeItem from './TagTreeItem';
 import TagMenu from './TagMenu';
+import TagEditDialog from './TagEditDialog';
 import ConfirmDialog from './ConfirmDialog';
 import { sortTagsByNumber } from './utils';
 
@@ -22,9 +23,10 @@ import { sortTagsByNumber } from './utils';
  * @param {Array} props.tags - 标签列表
  * @param {Function} props.onGenerateSubTags - 生成子标签的回调函数
  * @param {Function} props.onGenerateQuestions - 生成问题的回调函数
+ * @param {Function} props.onTagsUpdate - 标签更新的回调函数
  */
 const DistillTreeView = forwardRef(function DistillTreeView(
-  { projectId, tags = [], onGenerateSubTags, onGenerateQuestions },
+  { projectId, tags = [], onGenerateSubTags, onGenerateQuestions, onTagsUpdate },
   ref
 ) {
   const { t } = useTranslation();
@@ -43,6 +45,8 @@ const DistillTreeView = forwardRef(function DistillTreeView(
   const [questionToDelete, setQuestionToDelete] = useState(null);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [tagToDelete, setTagToDelete] = useState(null);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [tagToEdit, setTagToEdit] = useState(null);
   const [project, setProject] = useState(null);
   const [projectName, setProjectName] = useState('');
 
@@ -156,6 +160,39 @@ const DistillTreeView = forwardRef(function DistillTreeView(
   const handleMenuClose = () => {
     setMenuAnchorEl(null);
     setSelectedTagForMenu(null);
+  };
+
+  // 打开编辑标签对话框
+  const openEditDialog = () => {
+    setTagToEdit(selectedTagForMenu);
+    setEditDialogOpen(true);
+    handleMenuClose();
+  };
+
+  // 关闭编辑标签对话框
+  const closeEditDialog = () => {
+    setEditDialogOpen(false);
+    setTagToEdit(null);
+  };
+
+  // 处理编辑标签成功
+  const handleEditTagSuccess = updatedTag => {
+    // 更新标签数据，不刷新页面
+    const updateTagInTree = tagList => {
+      return tagList.map(tag => {
+        if (tag.id === updatedTag.id) {
+          return { ...tag, label: updatedTag.label };
+        }
+        if (tag.children && tag.children.length > 0) {
+          return { ...tag, children: updateTagInTree(tag.children) };
+        }
+        return tag;
+      });
+    };
+
+    // 调用父组件的回调更新标签列表
+    const updatedTags = updateTagInTree(tags);
+    onTagsUpdate?.(updatedTags);
   };
 
   // 打开删除确认对话框
@@ -437,7 +474,17 @@ const DistillTreeView = forwardRef(function DistillTreeView(
         anchorEl={menuAnchorEl}
         open={Boolean(menuAnchorEl)}
         onClose={handleMenuClose}
+        onEdit={openEditDialog}
         onDelete={openDeleteConfirm}
+      />
+
+      {/* 编辑标签对话框 */}
+      <TagEditDialog
+        open={editDialogOpen}
+        tag={tagToEdit}
+        projectId={projectId}
+        onClose={closeEditDialog}
+        onSuccess={handleEditTagSuccess}
       />
 
       {/* 删除标签确认对话框 */}

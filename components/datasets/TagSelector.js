@@ -20,11 +20,28 @@ export default function TagSelector({
 }) {
   const { t } = useTranslation();
   const [inputValue, setInputValue] = useState('');
-  const [selectedTags, setSelectedTags] = useState(value);
+
+  // 确保 value 始终是数组
+  const normalizeValue = val => {
+    if (Array.isArray(val)) {
+      return val;
+    }
+    if (typeof val === 'string') {
+      try {
+        const parsed = JSON.parse(val);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    }
+    return [];
+  };
+
+  const [selectedTags, setSelectedTags] = useState(() => normalizeValue(value));
 
   // 同步外部value变化
   useEffect(() => {
-    setSelectedTags(value);
+    setSelectedTags(normalizeValue(value));
   }, [value]);
 
   // 处理标签变更

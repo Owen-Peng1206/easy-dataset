@@ -43,14 +43,14 @@ export async function POST(request, { params }) {
 
     try {
       // 调用纯API流式输出
-      const response = await llmClient.chatStreamAPI(formattedMessages);
+      const response = await llmClient.chatStreamAPI(formattedMessages.filter(f => f.role !== 'error'));
       // 返回流式响应
       return response;
     } catch (error) {
       console.error('Failed to call LLM API:', error);
       return NextResponse.json(
         {
-          error: `Failed to call ${model.provider} model: ${error.message}`
+          error: `Failed to call ${model.modelId} model: ${error.message}`
         },
         { status: 500 }
       );

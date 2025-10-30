@@ -205,7 +205,13 @@ export default function ModelSettings({ projectId }) {
   const handleOpenModelDialog = (model = null) => {
     if (model) {
       console.log('handleOpenModelDialog', model);
-      setModelConfigForm(model);
+      // 编辑现有模型时，为未设置的参数应用默认值
+      setModelConfigForm({
+        ...model,
+        temperature: model.temperature !== undefined ? model.temperature : DEFAULT_MODEL_SETTINGS.temperature,
+        maxTokens: model.maxTokens !== undefined ? model.maxTokens : DEFAULT_MODEL_SETTINGS.maxTokens,
+        topP: model.topP !== undefined && model.topP !== 0 ? model.topP : DEFAULT_MODEL_SETTINGS.topP
+      });
       getProviderModels(model.providerId);
     } else {
       setModelConfigForm({
@@ -236,7 +242,7 @@ export default function ModelSettings({ projectId }) {
   // 保存模型
   const handleSaveModel = () => {
     axios
-      .post(`/api/projects/${projectId}/model-config`, modelConfigForm)
+      .post(`/api/projects/${projectId}/model-config`, { ...modelConfigForm, modelId: modelConfigForm.modelName })
       .then(response => {
         if (selectedModelInfo && selectedModelInfo.id === response.data.id) {
           setSelectedModelInfo(response.data);
@@ -580,6 +586,28 @@ export default function ModelSettings({ projectId }) {
                 />
                 <Typography variant="body2" sx={{ minWidth: '40px' }}>
                   {modelConfigForm.maxTokens}
+                </Typography>
+              </Box>
+            </Grid>
+            <Grid item xs={12}>
+              <Typography id="top-p-slider" gutterBottom>
+                {t('models.topP', { defaultValue: 'Top P' })}
+              </Typography>
+
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <Slider
+                  min={0}
+                  max={1}
+                  name="topP"
+                  value={modelConfigForm.topP}
+                  onChange={handleModelFormChange}
+                  step={0.1}
+                  valueLabelDisplay="auto"
+                  aria-label="topP"
+                  sx={{ flex: 1 }}
+                />
+                <Typography variant="body2" sx={{ minWidth: '40px' }}>
+                  {modelConfigForm.topP}
                 </Typography>
               </Box>
             </Grid>

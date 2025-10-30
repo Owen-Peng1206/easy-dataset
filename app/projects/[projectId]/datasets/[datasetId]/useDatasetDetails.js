@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAtomValue } from 'jotai/index';
 import { selectedModelInfoAtom } from '@/lib/store';
@@ -44,6 +44,19 @@ export default function useDatasetDetails(projectId, datasetId) {
     const storedValue = localStorage.getItem('shortcutsEnabled');
     return storedValue !== null ? storedValue === 'true' : false;
   });
+
+  // 输入环境判断，避免在输入框/可编辑区域误触快捷键
+  const isEditableTarget = el => {
+    if (!el) return false;
+    const tag = el.tagName?.toLowerCase();
+    if (tag && ['input', 'textarea', 'select'].includes(tag)) return true;
+    if (el.isContentEditable) return true;
+    // 兼容嵌套的可编辑区域与常见富文本编辑器
+    return !!el.closest?.('[contenteditable="true"], .ProseMirror, .ql-editor');
+  };
+
+  // 简单节流，避免连续触发
+  const lastShortcutRef = useRef(0);
 
   // 异步获取Token数量
   const fetchTokenCount = async () => {
@@ -260,10 +273,15 @@ export default function useDatasetDetails(projectId, datasetId) {
   };
 
   const handleCloseOptimizeDialog = () => {
-    if (optimizeDialog.loading) return;
-    setOptimizeDialog({
-      open: false,
-      loading: false
+    setOptimizeDialog(prev => {
+      // 如果正在优化，不允许关闭
+      if (prev.loading) {
+        return prev;
+      }
+      return {
+        open: false,
+        loading: false
+      };
     });
   };
 
@@ -275,53 +293,57 @@ export default function useDatasetDetails(projectId, datasetId) {
         message: '请先选择模型，可以在顶部导航栏选择',
         severity: 'error'
       });
-      setOptimizeDialog(prev => ({ ...prev, open: false }));
       return;
     }
 
-    try {
-      setOptimizeDialog(prev => ({ ...prev, loading: true }));
-      const language = i18n.language === 'zh-CN' ? '中文' : 'en';
-      const response = await fetch(`/api/projects/${projectId}/datasets/optimize`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          datasetId,
-          model,
-          advice,
-          language
-        })
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || '优化失败');
-      }
-
-      // 优化成功后，重新查询数据以获取最新状态
-      await fetchDatasets();
-      // 优化可能改变了文本内容，重新获取Token计数
-      fetchTokenCount();
-
-      setSnackbar({
-        open: true,
-        message: 'AI智能优化成功',
-        severity: 'success'
-      });
-    } catch (error) {
-      setSnackbar({
-        open: true,
-        message: error.message || '优化失败',
-        severity: 'error'
-      });
-    } finally {
-      setOptimizeDialog({
+    // 立即关闭对话框，并设置优化中状态
+    setOptimizeDialog(prev => {
+      const newState = {
         open: false,
-        loading: false
-      });
-    }
+        loading: true
+      };
+      return newState;
+    });
+
+    toast.info('已开始优化，请稍候...');
+
+    // 异步后台处理，不等待结果
+    (async () => {
+      try {
+        const language = i18n.language === 'zh-CN' ? '中文' : 'en';
+        const response = await fetch(`/api/projects/${projectId}/datasets/optimize`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            datasetId,
+            model,
+            advice,
+            language
+          })
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || '优化失败');
+        }
+
+        // 优化成功后，重新查询数据以获取最新状态
+        await fetchDatasets();
+        // 优化可能改变了文本内容，重新获取Token计数
+        fetchTokenCount();
+
+        toast.success('AI智能优化成功');
+      } catch (error) {
+        toast.error(error.message);
+      } finally {
+        setOptimizeDialog({
+          open: false,
+          loading: false
+        });
+      }
+    })();
   };
 
   // 查看文本块详情
@@ -359,21 +381,42 @@ export default function useDatasetDetails(projectId, datasetId) {
   useEffect(() => {
     const handleKeyDown = event => {
       if (!shortcutsEnabled) return;
+
+      // 在输入框或可编辑区域时不触发
+      const activeEl = typeof document !== 'undefined' ? document.activeElement : null;
+      if (isEditableTarget(event.target) || isEditableTarget(activeEl)) {
+        return;
+      }
+
+      // 仅要求 Shift 修饰键，降低误触且更简单
+      if (!event.shiftKey) return;
+
+      // 简单节流，过滤极短时间内重复触发
+      const now = Date.now();
+      if (now - (lastShortcutRef.current || 0) < 250) {
+        return;
+      }
+      lastShortcutRef.current = now;
+
       switch (event.key) {
-        case 'ArrowLeft': // 上一个
+        case 'ArrowLeft': // 上一个（Shift + ArrowLeft）
+          event.preventDefault();
           handleNavigate('prev');
           break;
-        case 'ArrowRight': // 下一个
+        case 'ArrowRight': // 下一个（Shift + ArrowRight）
+          event.preventDefault();
           handleNavigate('next');
           break;
-        case 'y': // 确认
+        case 'y': // 确认（Shift + Y）
         case 'Y':
           if (!confirming && currentDataset && !currentDataset.confirmed) {
+            event.preventDefault();
             handleConfirm();
           }
           break;
-        case 'd': // 删除
+        case 'd': // 删除（Shift + D）
         case 'D':
+          event.preventDefault();
           handleDelete();
           break;
         default:

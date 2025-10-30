@@ -1,6 +1,6 @@
 {
   "name": "easy-dataset",
-  "version": "1.5.1",
+  "version": "1.6.0",
   "private": true,
   "author": {
     "name": "ConardLi",
@@ -47,6 +47,7 @@
   },
   "dependencies": {
     "@ai-sdk/openai": "^1.3.9",
+    "@ai-sdk/openai-compatible": "^1.0.22",
     "@emotion/react": "^11.11.3",
     "@emotion/styled": "^11.11.0",
     "@fontsource/inter": "^5.0.16",
@@ -69,6 +70,7 @@
     "github-markdown-css": "^5.8.1",
     "i18next": "^24.2.2",
     "i18next-browser-languagedetector": "^8.0.4",
+    "image-size": "^2.0.2",
     "jotai": "^2.12.3",
     "jsonrepair": "^3.13.1",
     "jszip": "^3.10.1",
@@ -79,7 +81,7 @@
     "next-themes": "^0.2.1",
     "ollama-ai-provider": "^1.2.0",
     "opener": "^1.5.2",
-    "pdf2md-js": "^1.0.8",
+    "pdf2md-js": "1.0.8",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-i18next": "^15.4.1",
@@ -88,7 +90,8 @@
     "sonner": "^2.0.3",
     "turndown": "^7.2.0",
     "xmldom": "^0.6.0",
-    "zhipu-ai-provider": "^0.1.1"
+    "zhipu-ai-provider": "^0.1.1",
+    "zod": "^3.25.76"
   },
   "license": "AGPL 3.0",
   "devDependencies": {

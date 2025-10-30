@@ -26,6 +26,7 @@ const FilterDialog = ({
   filterScoreRange,
   filterCustomTag,
   filterNoteKeyword,
+  filterChunkName,
   availableTags,
   onFilterConfirmedChange,
   onFilterHasCotChange,
@@ -33,6 +34,7 @@ const FilterDialog = ({
   onFilterScoreRangeChange,
   onFilterCustomTagChange,
   onFilterNoteKeywordChange,
+  onFilterChunkNameChange,
   onResetFilters,
   onApplyFilters
 }) => {
@@ -148,6 +150,27 @@ const FilterDialog = ({
             value={filterNoteKeyword}
             onChange={e => onFilterNoteKeywordChange(e.target.value)}
             placeholder={t('datasets.filterNoteKeywordPlaceholder')}
+            fullWidth
+            size="small"
+            sx={{ mt: 1 }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon fontSize="small" />
+                </InputAdornment>
+              )
+            }}
+          />
+        </Box>
+
+        <Box sx={{ mb: 2 }}>
+          <Typography variant="subtitle2" gutterBottom>
+            {t('datasets.filterChunkName')}
+          </Typography>
+          <TextField
+            value={filterChunkName}
+            onChange={e => onFilterChunkNameChange(e.target.value)}
+            placeholder={t('datasets.filterChunkNamePlaceholder')}
             fullWidth
             size="small"
             sx={{ mt: 1 }}

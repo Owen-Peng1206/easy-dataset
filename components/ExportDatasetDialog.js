@@ -113,7 +113,14 @@ const ExportDatasetDialog = ({ open, onClose, onExport, projectId }) => {
     setCustomInstruction(event.target.value);
   };
 
-  const handleExport = () => {
+  const handleExport = options => {
+    // 如果 LocalExportTab 传入了完整的导出配置（例如平衡导出），直接使用该配置
+    if (options && typeof options === 'object' && options.balanceMode) {
+      onExport(options);
+      return;
+    }
+
+    // 否则使用当前对话框内的状态组装导出配置
     onExport({
       formatType,
       systemPrompt,

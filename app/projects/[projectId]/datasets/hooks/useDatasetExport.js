@@ -18,25 +18,27 @@ const useDatasetExport = projectId => {
 
       // 分批获取数据
       while (hasMore) {
-        let apiUrl = `/api/projects/${projectId}/datasets/export`;
-        const params = ['batchMode=true', `offset=${offset}`, `batchSize=${batchSize}`];
+        const apiUrl = `/api/projects/${projectId}/datasets/export`;
+        const requestBody = {
+          batchMode: true,
+          offset: offset,
+          batchSize: batchSize
+        };
 
         // 如果有选中的数据集 ID，传递 ID 列表
         if (exportOptions.selectedIds && exportOptions.selectedIds.length > 0) {
-          params.push(`selectedIds=${encodeURIComponent(JSON.stringify(exportOptions.selectedIds))}`);
+          requestBody.selectedIds = exportOptions.selectedIds;
         } else if (exportOptions.confirmedOnly) {
-          params.push(`status=confirmed`);
+          requestBody.status = 'confirmed';
         }
 
         // 检查是否是平衡导出模式
         if (exportOptions.balanceMode && exportOptions.balanceConfig) {
-          params.push(`balanceMode=true`);
-          params.push(`balanceConfig=${encodeURIComponent(JSON.stringify(exportOptions.balanceConfig))}`);
+          requestBody.balanceMode = true;
+          requestBody.balanceConfig = exportOptions.balanceConfig;
         }
 
-        apiUrl += `?${params.join('&')}`;
-
-        const response = await axios.get(apiUrl);
+        const response = await axios.post(apiUrl, requestBody);
         const batchResult = response.data;
 
         // 如果需要包含文本块内容，批量查询并填充
@@ -244,6 +246,8 @@ const useDatasetExport = projectId => {
       fileExtension = 'json';
     }
 
+    console.log(22222, content);
+
     // 创建 Blob 对象
     const blob = new Blob([content], { type: mimeType || 'application/json' });
 
@@ -260,7 +264,7 @@ const useDatasetExport = projectId => {
     const a = document.createElement('a');
     a.href = url;
     // const formatSuffix = exportOptions.formatType === 'alpaca' ? 'alpaca' : 'sharegpt';
-    const formatSuffix = formatSuffixMap[exportOptions.formatType] || exportOptions.formatType;
+    const formatSuffix = formatSuffixMap[exportOptions.formatType] || exportOptions.formatType || 'export';
     const balanceSuffix = exportOptions.balanceMode ? '-balanced' : '';
     const dateStr = new Date().toISOString().slice(0, 10);
     a.download = `datasets-${projectId}-${formatSuffix}${balanceSuffix}-${dateStr}.${fileExtension}`;
@@ -277,27 +281,23 @@ const useDatasetExport = projectId => {
   // 导出数据集（保持向后兼容的原有功能）
   const exportDatasets = async exportOptions => {
     try {
-      let apiUrl = `/api/projects/${projectId}/datasets/export`;
-      const params = [];
+      const apiUrl = `/api/projects/${projectId}/datasets/export`;
+      const requestBody = {};
 
       // 如果有选中的数据集 ID，传递 ID 列表
       if (exportOptions.selectedIds && exportOptions.selectedIds.length > 0) {
-        params.push(`selectedIds=${encodeURIComponent(JSON.stringify(exportOptions.selectedIds))}`);
+        requestBody.selectedIds = exportOptions.selectedIds;
       } else if (exportOptions.confirmedOnly) {
-        params.push(`status=confirmed`);
+        requestBody.status = 'confirmed';
       }
 
       // 检查是否是平衡导出模式
       if (exportOptions.balanceMode && exportOptions.balanceConfig) {
-        params.push(`balanceMode=true`);
-        params.push(`balanceConfig=${encodeURIComponent(JSON.stringify(exportOptions.balanceConfig))}`);
+        requestBody.balanceMode = true;
+        requestBody.balanceConfig = exportOptions.balanceConfig;
       }
 
-      if (params.length > 0) {
-        apiUrl += `?${params.join('&')}`;
-      }
-
-      const response = await axios.get(apiUrl);
+      const response = await axios.post(apiUrl, requestBody);
       let dataToExport = response.data;
 
       // 使用通用的数据处理和下载函数

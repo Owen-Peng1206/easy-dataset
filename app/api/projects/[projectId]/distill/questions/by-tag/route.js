@@ -10,8 +10,6 @@ export async function GET(request, { params }) {
     const { searchParams } = new URL(request.url);
     const tagId = searchParams.get('tagId');
 
-    console.log('[distill/questions/by-tag] 请求参数:', { projectId, tagId });
-
     // 验证参数
     if (!projectId) {
       return NextResponse.json({ error: '项目ID不能为空' }, { status: 400 });
@@ -29,8 +27,6 @@ export async function GET(request, { params }) {
     if (!tag) {
       return NextResponse.json({ error: '标签不存在' }, { status: 404 });
     }
-
-    console.log('[distill/questions/by-tag] 标签信息:', tag);
 
     // 获取或创建蒸馏文本块
     let distillChunk = await db.chunks.findFirst({
